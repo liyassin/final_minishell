@@ -1,0 +1,245 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   token_utils.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/04/29 18:29:11 by anassih           #+#    #+#             */
+/*   Updated: 2025/05/05 17:26:31 by anassih          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "tokenization.h"
+
+/*
+ * Function to retrieve the value of an environment variable.
+ * Searches the envp array for a match with the given variable name.
+ * If found, returns the value part of the variable.
+ */
+// static char	*get_env_value(const char *name, char **envp)
+// {
+// 	int		i;
+// 	size_t	name_len;
+
+// 	if (!name || !envp)
+// 		return (NULL);
+// 	name_len = ft_strlen(name);
+// 	i = 0;
+// 	while (envp[i] != NULL)
+// 	{
+// 		if (ft_strncmp(envp[i], name, name_len) == 0 && envp[i][name_len] == '=')
+// 		{
+// 			return (ft_strchr(envp[i], '=') + 1);
+// 		}
+// 		i++;
+// 	}
+// 	return (NULL);
+// }
+
+/*
+ * Expands an environment variable in the string if it starts with '$'.
+ * Returns the string with the variable expanded, or the original string if no expansion occurs.
+ */
+char *expand_env_var(const char *str, char **envp)
+{
+	char *var_name;
+	char *value;
+	int len;
+
+	if (str == NULL || str[0] != '$')
+		return (ft_strdup(str));
+	len = 1;
+	while (str[len] && (ft_isalnum(str[len]) || str[len] == '_'))
+		len++;
+	var_name = ft_substr(str, 1, len - 1); // Extract variable name without '$'
+	if (var_name == NULL)
+		return (NULL);
+	value = get_env_value(var_name, envp); // Retrieve value from envp
+	free(var_name);
+	if (value == NULL)
+		return (ft_strdup("")); // Return empty string if variable not found
+	return (ft_strdup(value));
+}
+
+/*
+ * Safely appends the source string to the destination at position j.
+ * Returns the new position after appending.
+ */
+//static int	safe_strcpy(char *dst, const char *src, int j, int max_size)
+//{
+//	int	i;
+//
+//	i = 0;
+//	while (src[i] && j < max_size - 1)
+//	{
+//		dst[j] = src[i];
+//		i++;
+//		j++;
+//	}
+//	dst[j] = '\0';
+//	return (j);
+//}
+
+/*
+ * Processes double quotes in a token string.
+ * Expands environment variables and handles other special characters.
+ */
+char *process_double_quotes(const char *token, char **envp)
+{
+	char *result;
+	char *temp;
+	int i;
+	int j;
+	int len;
+
+	i = 0;
+	j = 0;
+	len = ft_strlen(token);
+	result = (char *)malloc(len + 1); // Allocate memory for the result
+	if (result == NULL)
+		return (NULL);
+	i = 1; // Skip opening quote
+	while (i < len - 1) // Process everything between quotes
+	{
+		if (token[i] == '$') // Expand environment variable
+		{
+			temp = expand_env_var(&token[i], envp);
+			if (temp != NULL)
+			{
+				strcpy(&result[j], temp);
+				j += ft_strlen(temp);
+				free(temp);
+			}
+			while (token[i] && (ft_isalnum(token[i]) || token[i] == '_'))
+				i++;
+			i--; // Adjust for the loop increment
+		}
+		else
+		{
+			result[j++] = token[i];
+		}
+		i++;
+	}
+	result[j] = '\0';
+	return (result);
+}
+
+/*
+ * Handles single or double quotes in a token.
+ * Removes surrounding quotes or expands environment variables if inside double quotes.
+ */
+char	*handle_quotes(char *token, char **envp)
+{
+	size_t	len;
+	char	*content;
+	char	*expanded;
+
+	if (!token)
+		return (NULL);
+	len = ft_strlen(token);
+	if (len >= 2 && token[0] == '\'' && token[len - 1] == '\'')
+	{
+		content = ft_substr(token, 1, len - 2);
+		return (content);
+	}
+	else if (len >= 2 && token[0] == '"' && token[len - 1] == '"')
+	{
+		content = ft_substr(token, 1, len - 2);
+		expanded = expand_env_vars(content, envp);
+		free(content);
+		return (expanded);
+	}
+	return (expand_env_vars(token, envp));
+}
+
+/*
+ * Tokenizes the input string into an abstract syntax tree (AST).
+ * Handles commands, arguments, input/output redirection, and environment variable expansion.
+ */
+t_ast *tokenize_input(const char *input, char **envp)
+{
+	t_ast *ast;
+	char **token;
+	char **temp;
+	int i;
+	int arg_index;
+
+	ast = (t_ast *)ft_calloc(sizeof(t_ast), 1);
+	if (!ast)
+		return (NULL);
+	temp = smart_split(input);
+	if (!temp)
+	{
+		free_ast(ast);
+		return (NULL);
+	}
+	i = 0;
+	token = temp;
+	while (token != NULL && *token != NULL)
+	{
+		i++;
+		token++;
+	}
+	free(temp); // why ?
+	ast->args = (char **)malloc(sizeof(char *) * (i + 1));
+	if (ast->args == NULL)
+	{
+		free_ast(ast);
+		return (NULL);
+	}
+	temp = smart_split(input);
+	if (temp == NULL)
+	{
+		free_ast(ast);
+		return (NULL);
+	}
+	arg_index = 0;
+	ast->count_in = 0; // DONE ! --> sent through the ast but still need to remove one variable for norminette
+	ast->count_out = 0; // DONE ! --> Note above !
+	token = temp;
+	ast->output_file = (char **)ft_calloc(sizeof(char *), i + 1);
+	ast->input_file = (char **)ft_calloc(sizeof(char *), i + 1);
+	if (!ast->output_file || !ast->input_file)
+	{
+		free_ast(ast);
+		return (NULL);
+	}
+	while (token != NULL && *token != NULL)
+	{
+		if (ft_strcmp(*token, ">") == 0)
+		{
+			token++;
+			if (token && *token)
+				ast->output_file[ast->count_out] = ft_strdup(*token);
+			ast->count_out++;
+			if (ast->flag == 1 || ast->flag == 3)
+				ast->flag = 3;
+			else
+				ast->flag = 2;
+		}
+		else if (ft_strcmp(*token, "<") == 0)
+		{
+			token++;
+			if (token && *token)
+				ast->input_file[ast->count_in] = ft_strdup(*token);
+			ast->count_in++;
+			if (ast->flag == 2 || ast->flag == 3)
+			ast->flag = 3;
+			else
+			ast->flag = 1;
+		}
+		else
+		{
+			ast->args[arg_index] = handle_quotes(*token, envp);
+			arg_index++;
+		}
+		token++;
+	}
+	ast->args[arg_index] = NULL;
+	if (arg_index > 0)
+		ast->command = ft_strdup(ast->args[0]);
+
+	free_split(temp);
+	return (ast);
+}

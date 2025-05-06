@@ -1,0 +1,59 @@
+-> remember to free the ast input / output --> DONE
+-> out the i in size into the struct to be used in that --> done
+-> remove the flags since its unecessary --> i ll just leave it for now
+
+--> redirections remade | env & export --> FIXED !
+
+--> test : need to test echo with env variables echo "test $VAR"
+--> test : export TEST=$ARG:$VAR\
+
+1. **Detect Variables**: In any token that's being processed (like in `handle_quotes`), scan for `$` followed by a valid variable name. Valid names start with a letter or underscore and contain alphanumeric characters or underscores.
+
+2. **Expand Variables**: For each detected variable, look up its value in the environment. Replace the `$VAR` with the value. If the variable doesn't exist, replace it with an empty string.
+
+3. **Handle Special Cases**: Variables inside double quotes should be expanded, but variables inside single quotes should not. So `echo "$VAR"` expands, `echo '$VAR'` does not.
+
+4. **Modify `handle_quotes`**: This function needs to parse the token, identify variables, and expand them. It should differentiate between single and double quotes for expansion.
+
+5. **Modify `builtin_export`**: When processing values in export commands, expand any variables present in the value before assigning them to the environment.
+
+So, the plan is:
+
+- Update `handle_quotes` to expand variables in double-quoted strings.
+
+- Use a helper function to replace `$VAR` with the environment value.
+
+- Ensure that in `builtin_export`, when processing the value (after stripping quotes), variables are expanded.
+
+But how does the current `strip_quotes` function work? If it's just removing the quotes without processing variables, then after stripping quotes in `builtin_export`, we need to expand variables in the value.
+
+Wait, in `builtin_export`, when the user does `export TEST=$ARG:$VAR`, the value part (`$ARG:$VAR`) is processed by `strip_quotes`, which removes quotes, but then needs to expand the variables. So after stripping quotes, the value should be passed through the variable expansion function.
+
+So, in `builtin_export`, after getting `value = strip_quotes(eq_pos + 1);`, we need to expand any variables in `value` before calling `update_env`.
+
+Similarly, in `handle_quotes`, when processing a token (like in `echo "test $VAR"`), after handling quotes, variables inside double quotes should be expanded.
+
+So, the key functions to modify are `handle_quotes` and `strip_quotes` (or wherever variable expansion is needed).
+
+Let me sketch a helper function to expand variables in a string:
+
+char *expand_env_vars(const char *input, char **envp) {
+
+// Allocate a buffer to build the result
+
+// Iterate through input character by character
+
+// When '$' is found, collect the variable name
+
+// Look up the variable in envp
+
+// Append the value to the buffer
+
+// Return the expanded string
+
+}
+
+---------------------
+builtins.c -> line 65 --> cwd = getcwd(NULL, 0) 
+
+    --> The 1st argument to 'getcwd' is NULL but should not be NULL ?
