@@ -12,278 +12,324 @@
 
 #include "builtins.h"
 
-static int	validate_identifier(const char *name)
+int builtin_exit(char **args, t_context *ctx)
 {
-	int	i;
+    long code = ctx->exit_status;
+    int idx;
 
-	if (!name || (!ft_isalpha(name[0]) && name[0] != '_'))
-		return (0);
-	i = 0;
-	while (name[++i])
-		if (!ft_isalnum(name[i]) && name[i] != '_')
-			return (0);
-	return (1);
-}
-
-int builtin_exit(char **args)
-{
-    (void)args;
+    /* Always print `exit` */
     printf("exit\n");
-    exit(0);
+
+    if (args[1]) {
+        /* Too many arguments */
+        if (args[2]) {
+            ft_putstr_fd("exit: too many arguments\n", STDERR_FILENO);
+            ctx->exit_status = 1;  // Set error status but don't exit shell
+            return 1;
+        }
+        
+        /* Validate numeric argument */
+        idx = 0;
+        if (args[1][0] == '+' || args[1][0] == '-')
+            idx++;
+        
+        /* Check for valid numeric format */
+        for (int i = idx; args[1][i]; i++) {
+            if (!ft_isdigit((unsigned char)args[1][i])) {
+                ft_putstr_fd("exit: ", STDERR_FILENO);
+                ft_putstr_fd(args[1], STDERR_FILENO);
+                ft_putstr_fd(": numeric argument required\n", STDERR_FILENO);
+                ctx->exit_status = 255;
+                return 255;  // Special code to indicate exit
+            }
+        }
+        
+        /* Convert to long */
+        code = ft_atoi(args[1]);
+    }
+
+    ctx->exit_status = (int)code;
+    return 255;  // Special code to indicate exit
 }
 
-/*
-** Path resolution with tilde expansion
-** Returns: resolved path or NULL on error
-*/
-static char *resolve_cd_path(const char *path, char **env)
+static char *resolve_cd_path(const char *path, t_context *ctx)
 {
-    char    *expanded;
-    char    *home;
+    char *expanded = NULL;
+    char *home;
 
-    home = get_env_value("HOME", env);
-    if (!home)
-        return (ft_putstr_fd("minishell: cd: HOME not set\n", 2), NULL); // this too NULL
-
-    if (path[1] == '/')
-    {
-        expanded = ft_strjoin(home, path + 1);
-        free(home); // Free home after joining
+    /* Tilde expansion */
+    if (path[0] == '~') {
+        home = get_env_value("HOME", ctx->env);
+        if (!home) {
+            ft_putstr_fd("minishell: cd: HOME not set\n", STDERR_FILENO);
+            return NULL;
+        }
+        
+        /* Handle ~/path */
+        if (path[1] == '/')
+            return ft_strjoin(home, path + 1);
+        
+        /* Handle bare ~ */
+        if (path[1] == '\0')
+            return ft_strdup(home);
+        
+        /* Invalid tilde usage */
+        ft_putstr_fd("minishell: cd: invalid tilde usage\n", STDERR_FILENO);
+        return NULL;
     }
-    else
-    {
-        expanded = ft_strdup(home);
-        free(home); // Free home after duplication
-    }
-
-    if (!expanded)
-        return (perror("minishell: cd"), NULL); // must be NULL next time cuz i changed
-    return (expanded);
-}
-
-/*
-** Updates PWD and OLDPWD environment variables
-** Uses getcwd() for accuracy, falls back to given path if needed
-*/
-static void update_pwd_env(char ***shell_env, const char *new_path)
-{
-    char    *old_pwd;
-    char    *cwd;
-
-    // Save old PWD value
-    old_pwd = get_env_value("PWD", *shell_env);
-    if (old_pwd)
-        update_env(shell_env, "OLDPWD", old_pwd);
-
-    // Get current directory (dynamic allocation)
-    cwd = getcwd(NULL, 0);
-    if (!cwd)  // Fallback to given path if getcwd fails
-        cwd = ft_strdup(new_path);
     
-    if (cwd)
-    {
-        update_env(shell_env, "PWD", cwd);
+    /* Absolute path */
+    if (path[0] == '/')
+        return ft_strdup(path);
+    
+    /* Relative path */
+    char *cwd = getcwd(NULL, 0);
+    if (!cwd) {
+        perror("minishell: cd");
+        return NULL;
+    }
+    
+    char *tmp = ft_strjoin(cwd, "/");
+    expanded = ft_strjoin(tmp, path);
+    free(tmp);
+    free(cwd);
+    return expanded;
+}
+
+static void update_pwd_env(t_context *ctx)
+{
+    char *old_pwd = get_env_value("PWD", ctx->env);
+    if (old_pwd)
+        update_env(&ctx->env, "OLDPWD", old_pwd);
+
+    char *cwd = getcwd(NULL, 0);
+    if (cwd) {
+        update_env(&ctx->env, "PWD", cwd);
         free(cwd);
     }
-    else
-        perror("minishell: cd");
 }
 
-/*
-** Builtin cd command implementation
-** Returns: 0 on success, 1 on error (following shell convention)
-** Handles: ~ expansion, -, environment updates
-*/
-int     builtin_cd(char **args, char ***shell_env)
+int builtin_cd(char **args, t_context *ctx)
 {
-    char    *path;
-    char    *resolved_path;
+    char *path = NULL;
+    char *resolved_path = NULL;
+    int status = 1; // Default to error status
 
-    // Case 1: cd without arguments or "cd ~"
-    if (!args[1] || ft_strcmp(args[1], "~") == 0)
-    {
-        if (!(path = get_env_value("HOME", *shell_env)))
-            return (ft_putstr_fd("minishell: cd: HOME not set\n", 2), 1);
+    if (!args[1] || ft_strcmp(args[1], "~") == 0) {
+        path = get_env_value("HOME", ctx->env);
+        if (!path) {
+            ft_putstr_fd("minishell: cd: HOME not set\n", STDERR_FILENO);
+            ctx->exit_status = 1;
+            return 1;
+        }
     }
-    // Case 2: cd -
-    else if (ft_strcmp(args[1], "-") == 0)
-    {
-        if (!(path = get_env_value("OLDPWD", *shell_env)))
-            return (ft_putstr_fd("minishell: cd: OLDPWD not set\n", 2), 1);
-        ft_putendl_fd(path, STDOUT_FILENO); // Print directory after cd -
+    else if (ft_strcmp(args[1], "-") == 0) {
+        path = get_env_value("OLDPWD", ctx->env);
+        if (!path) {
+            ft_putstr_fd("minishell: cd: OLDPWD not set\n", STDERR_FILENO);
+            ctx->exit_status = 1;
+            return 1;
+        }
+        ft_putendl_fd(path, STDOUT_FILENO);
     }
-    // Case 3: Regular path argument
-    else
+    else {
         path = args[1];
-    // Resolve path (tilde expansion and error checking)
-    if (!(resolved_path = resolve_cd_path(path, *shell_env)))
-        return (1); // Error message already handled in resolve_cd_path
-    // Attempt directory change
-    if (chdir(resolved_path) != 0)
-    {
+    }
+
+    resolved_path = resolve_cd_path(path, ctx);
+    if (resolved_path) {
+        if (chdir(resolved_path) != 0) {
+            ft_putstr_fd("minishell: cd: ", STDERR_FILENO);
+            perror(resolved_path);
+            status = 1;
+        }
+        else {
+            update_pwd_env(ctx);
+            status = 0;
+        }
         free(resolved_path);
-        return (perror("minishell: cd"), 1);
     }
 
-    // Update environment variables after successful directory change
-    update_pwd_env(shell_env, resolved_path);
-    free(resolved_path);
-    return (0); // Success
+    ctx->exit_status = status;
+    return status;
 }
 
-int builtin_env(char **envp)
+int builtin_env(t_context *ctx)
 {
-    int i;
-
-    i = 0;
-    if (!envp)
-    {
-        write (STDERR_FILENO, "env: NULL environment\n", 21);
-        return (1);
+    if (!ctx->env) {
+        ft_putstr_fd("env: environment not initialized\n", STDERR_FILENO);
+        return (ctx->exit_status = 1, 1);
     }
-    while (envp[i])
-    {
-        if (envp[i])
-            printf("%s\n", envp[i]);
-        else
-            write  (STDERR_FILENO, "(null)\n", 7);
-        i++;
+    
+    for (int i = 0; ctx->env[i]; i++) {
+        /* Only show variables with values (VAR=value) */
+        if (ft_strchr(ctx->env[i], '=')) {
+            printf("%s\n", ctx->env[i]);
+        }
     }
-    return (1);
+    return (ctx->exit_status = 0, 0);
 }
 
-int builtin_pwd(void)
+int builtin_pwd(t_context *ctx)
 {
-    char    *cwd;
-
-    cwd = getcwd(NULL, 0); // allocating buffer via malloc() // getcwd => place an absolute pathname of the current working directory in the array pointed to by buf, and return buf.
-    if (cwd)
-    {
+    char *cwd = getcwd(NULL, 0);
+    if (cwd) {
         printf("%s\n", cwd);
-        free(cwd); // must free whenever cwd !NULL
+        free(cwd);
+        return (ctx->exit_status = 0, 0);
     }
-    else
-        perror("pwd");
-    return (1);
+    ft_putstr_fd("pwd: ", STDERR_FILENO);
+    perror("minishell: pwd");
+    return (ctx->exit_status = 1, 1);
 }
 
-int builtin_echo(char **args)
+int builtin_echo(char **args, t_context *ctx)
 {
-    int i, j;
-    int newline;
+    int i = 1;
+    int newline = 1;
+    int escape = 0;
 
-    newline = 1;
-    i = 1;
-    // Check for valid "-n" flags
-    while (args[i] && ft_strncmp(args[i], "-n", 2) == 0)
-    {
-        j = 2;
-        while (args[i][j] == 'n') // Ensure all characters after "-n" are 'n'
-            j++;
-        if (args[i][j] != '\0') // If there's any other character, stop treating it as a flag
-            break ;
-        newline = 0;
-        i++;
-    }
-    // Print remaining arguments
-    while (args[i])
-    {
-        ft_putstr_fd(args[i], STDOUT_FILENO);
-        if (args[++i])
-            ft_putchar_fd(' ', STDOUT_FILENO);
-    }
-    // Print newline if not suppressed
-    if (newline)
-        ft_putchar_fd('\n', STDOUT_FILENO);
-    return (1);
-}
-
-int		builtin_export(char **args, char ***shell_env)
-{
-	char	*eq_pos;
-	char	*name;
-	char	*value;
-	char	*expanded_value;
-	int		i;
-
-	i = 0;
-	if (!args[1])
-		return (builtin_env(*shell_env));
-	while (args[++i])
-	{
-		if ((eq_pos = ft_strchr(args[i], '=')))
-		{
-			name = ft_strndup(args[i], eq_pos - args[i]);
-			value = strip_quotes(eq_pos + 1);
-			expanded_value = expand_env_vars(value, *shell_env);
-			free(value);
-			value = expanded_value;
-			if (!validate_identifier(name))
-			{
-                ft_putstr_fd("minishell: export: `", STDERR_FILENO);
-        		ft_putstr_fd(args[i], STDERR_FILENO);
-        		ft_putstr_fd("': not a valid identifier\n", STDERR_FILENO);
-				free(name);
-				free(value);
-				return (1);
-			}
-			if (!update_env(shell_env, name, value))
-			{
-				free(name);
-				free(value);
-				return (1);
-			}
-			free(name);
-			free(value);
-		}
-	}
-	return (1);
-}
-
-
-int builtin_unset(char **args, char ***shell_env)
-{
-    int i;
-    int j;
-    int k;
-
-    if (!shell_env || !*shell_env) {
-        perror("Error: Invalid environment pointer\n");
-        return (1);
-    }
-    i = 1;
-    if (!args[i])
-    {
-        write (2, "unset: Too few arguments\n", 24);
-        return (1);
-    }
-    while (args[i])
-    {
-        if (!ft_isalpha(args[i][0]) && args[i][0] != '_')
-        {
-            write (2, "unset: not a valid identifier\n", 30);
-            i++;
-            continue ;
-        }
-        // Find and remove variable from shell_env
-        j = 0;
-        while ((*shell_env)[j])
-        {
-            if (ft_strncmp((*shell_env)[j], args[i], ft_strlen(args[i])) == 0 
-                && (*shell_env)[j][ft_strlen(args[i])] == '=')
-            {
-                free((*shell_env)[j]);
-                k = j;
-                while ((*shell_env)[k])
-                {
-                    (*shell_env)[k] = (*shell_env)[k + 1];
-                    k++;
-                }
-                break ;
+    /* Parse options like -n and -e */
+    while (args[i] && args[i][0] == '-') {
+        int valid = 1;
+        for (int j = 1; args[i][j]; j++) {
+            if (args[i][j] == 'n')
+                newline = 0;
+            else if (args[i][j] == 'e')
+                escape = 1;
+            else {
+                valid = 0;
+                break;
             }
-            j++;
         }
+        if (!valid) break;
         i++;
     }
-    return (1);
+
+    /* Print arguments with optional escape parsing */
+    for (; args[i]; i++) {
+        for (int j = 0; args[i][j]; j++) {
+            if (escape && args[i][j] == '\\') {
+                char next = args[i][j + 1];
+                if (next == 'n') { write(1, "\n", 1); j++; continue; }
+                if (next == 't') { write(1, "\t", 1); j++; continue; }
+                if (next == 'r') { write(1, "\r", 1); j++; continue; }
+                if (next == 'b') { write(1, "\b", 1); j++; continue; }
+                if (next == 'v') { write(1, "\v", 1); j++; continue; }
+                if (next == 'a') { write(1, "\a", 1); j++; continue; }
+                if (next == '\\'){ write(1, "\\", 1); j++; continue; }
+                // Unsupported escape → treat literally
+            }
+            write(1, &args[i][j], 1);
+        }
+        if (args[i + 1])
+            write(1, " ", 1);
+    }
+
+    if (newline)
+        write(1, "\n", 1);
+
+    return (ctx->exit_status = 0, 0);
+}
+
+static int is_valid_identifier(const char *name)
+{
+    if (!name || !*name)
+        return 0;
+    
+    /* First character must be letter or underscore */
+    if (!ft_isalpha(*name) && *name != '_')
+        return 0;
+    
+    /* Remaining characters must be alnum or underscore */
+    for (const char *p = name + 1; *p; p++) {
+        if (!ft_isalnum(*p) && *p != '_')
+            return 0;
+    }
+    return 1;
+}
+
+int builtin_export(char **args, t_context *ctx)
+{
+    int status = 0;
+    
+    /* Print environment when no arguments */
+    if (!args[1]) {
+        for (int i = 0; ctx->env[i]; i++) {
+            if (ft_strchr(ctx->env[i], '=')) {
+                /* Format: declare -x VAR="value" */
+                char *eq = ft_strchr(ctx->env[i], '=');
+                size_t name_len = eq - ctx->env[i];
+                char *name = ft_strndup(ctx->env[i], name_len);
+                char *value = eq + 1;
+                
+                printf("declare -x %s=\"%s\"\n", name, value);
+                free(name);
+            }
+        }
+        return (ctx->exit_status = 0, 0);
+    }
+    
+    /* Process each argument */
+    for (int i = 1; args[i]; i++) {
+        char *eq = ft_strchr(args[i], '=');
+        size_t name_len = eq ? (eq - args[i]) : ft_strlen(args[i]);
+        char *name = ft_strndup(args[i], name_len);
+        
+        /* Validate identifier */
+        if (!is_valid_identifier(name)) {
+            ft_putstr_fd("minishell: export: `", STDERR_FILENO);
+            ft_putstr_fd(args[i], STDERR_FILENO);
+            ft_putstr_fd("': not a valid identifier\n", STDERR_FILENO);
+            free(name);
+            status = 1;
+            continue;
+        }
+        
+        /* Update environment */
+        if (eq) {
+            /* Use literal value without expansion */
+            update_env(&ctx->env, name, eq + 1);
+        } else {
+            /* Create variable without value */
+            update_env(&ctx->env, name, "");
+        }
+        free(name);
+    }
+    
+    return (ctx->exit_status = status, status);
+}
+
+int builtin_unset(char **args, t_context *ctx)
+{
+    int status = 0;
+    
+    for (int i = 1; args[i]; i++) {
+        if (!is_valid_identifier(args[i])) {
+            ft_putstr_fd("minishell: unset: `", STDERR_FILENO);
+            ft_putstr_fd(args[i], STDERR_FILENO);
+            ft_putstr_fd("': not a valid identifier\n", STDERR_FILENO);
+            status = 1;
+            continue;
+        }
+        
+        /* Find and remove variable */
+        for (int j = 0; ctx->env[j]; j++) {
+            char *eq = ft_strchr(ctx->env[j], '=');
+            size_t name_len = eq ? (eq - ctx->env[j]) : ft_strlen(ctx->env[j]);
+            
+            if (ft_strncmp(ctx->env[j], args[i], name_len) == 0 && 
+                name_len == ft_strlen(args[i])) 
+            {
+                free(ctx->env[j]);
+                /* Shift remaining variables */
+                for (int k = j; ctx->env[k]; k++) {
+                    ctx->env[k] = ctx->env[k+1];
+                }
+                break;
+            }
+        }
+    }
+    
+    return (ctx->exit_status = status, status);
 }

@@ -13,15 +13,18 @@
 #ifndef BUILTINS_H
 # define BUILTINS_H
 
+/* Special return code to signal shell exit */
+#define EXIT_BUILTIN_SIGNAL 255
+
 # include "minishell.h"
 
-/* Built-in function */
-int     builtin_exit(char **args);
-int     builtin_cd(char **args, char ***shell_env);
-int     builtin_env(char **envp);
-int     builtin_pwd(void);
-int     builtin_echo(char **args);
-int     builtin_export(char **args, char ***shell_env);
-int     builtin_unset(char **args, char ***shell_env);
+/* Built-in function prototypes with context */
+int     builtin_exit(char **args, t_context *ctx);
+int     builtin_cd(char **args, t_context *ctx);
+int     builtin_env(t_context *ctx);
+int     builtin_pwd(t_context *ctx);
+int     builtin_echo(char **args, t_context *ctx);
+int     builtin_export(char **args, t_context *ctx);
+int     builtin_unset(char **args, t_context *ctx);
 
 #endif

@@ -12,180 +12,220 @@
 
 #include "env_utils.h"
 
-char    *strip_quotes(const char *str)
+char *strip_quotes(const char *str)
 {
     size_t len;
 
-    if (!str)
-        return (NULL);
-
+    if (!str) return NULL;
     len = ft_strlen(str);
-    if ((str[0] == '"' && str[len - 1] == '"')
-        || (str[0] == '\'' && str[len - 1] == '\''))
-        return (ft_substr(str, 1, len - 2)); // Remove surrounding quotes
-    return (ft_strdup(str)); // Return as-is
+    
+    if ((len >= 2) && 
+        ((str[0] == '"' && str[len-1] == '"') ||
+         (str[0] == '\'' && str[len-1] == '\''))) 
+    {
+        return ft_substr(str, 1, len - 2);
+    }
+    return ft_strdup(str);
 }
 
-char    **copy_environment(char **envp)
+char **copy_environment(char **envp)
 {
-    int i = 0;
-    int j = 0;
+    int count = 0;
     char **env_copy;
 
-    // Count the number of environment variables
-    while (envp[i])
-        i++;
-    // Allocate memory for the copy
-    env_copy = malloc(sizeof(char *) * (i + 1));
-    if (!env_copy)
-    {
-        perror("malloc");
-        return (NULL);
-    }
-    // Copy each environment variable
-    while (j < i)
-    {
-        env_copy[j] = strdup(envp[j]);
-        if (!env_copy[j])
-        {
-            perror("strdup");
-            while (j > 0)
-                free(env_copy[--j]);
-            free(env_copy);
-            return (NULL);
+    if (!envp) return NULL;
+    while (envp[count]) count++;
+    
+    env_copy = ft_calloc(count + 1, sizeof(char *));
+    if (!env_copy) return NULL;
+
+    for (int i = 0; i < count; i++) {
+        env_copy[i] = ft_strdup(envp[i]);
+        if (!env_copy[i]) {
+            free_split(env_copy);
+            return NULL;
         }
-        j++;
     }
-    env_copy[i] = NULL; // NULL-terminate the array
-    return (env_copy);
+    return env_copy;
 }
 
 void free_environment(char **env)
 {
-    int i = 0;
-
-    if (!env)
-        return;
-    while (env[i])
-    {
-        free(env[i]);
-        i++;
-    }
+    if (!env) return;
+    for (int i = 0; env[i]; i++) free(env[i]);
     free(env);
 }
 
-// Function to update the environment with a new variable (name=value)
 int update_env(char ***env, const char *key, const char *value)
 {
-    int     i;
-    int     count;
-    char    *value_dup;
-    char    *new_var;
-    char    **new_env;
+    if (!key || !env || !*env) return 0;
 
-    /* 1. Create new var string */
-    new_var = ft_strjoin(key, "=");
-    if (!new_var)
-        return (0);
-    value_dup = ft_strdup(value);
-    if (!value_dup)
-    {
-        free(new_var); // Cleanup previous allocation
-        return (0);
-    }
-    new_var = join_free(new_var, value_dup);
-    if (!new_var)
-        return (0);
-    /* 2. Check if var exists */
-    i = -1;
-    while ((*env)[++i])
-        if (ft_strncmp((*env)[i], key, ft_strlen(key)) == 0 && 
-            (*env)[i][ft_strlen(key)] == '=')
+    char *new_entry = join_free_const(ft_strjoin(key, "="), value);
+    if (!new_entry) return 0;
+
+    int i = 0;
+    size_t key_len = ft_strlen(key);
+    
+    while ((*env)[i]) {
+        if (ft_strncmp((*env)[i], key, key_len) == 0 && 
+            (*env)[i][key_len] == '=') 
         {
             free((*env)[i]);
-            (*env)[i] = new_var;
-            return (1);
+            (*env)[i] = new_entry;
+            return 1;
         }
-    /* 3. Create new environment */
-    count = i;
-    new_env = malloc(sizeof(char *) * (count + 2));
-    if (!new_env)
-    {
-        free(new_var);
-        return (0);
+        i++;
     }
-    /* 4. Copy existing vars */
-    i = -1;
-    while (++i < count)
-        new_env[i] = (*env)[i];
-    /* 5. Add new var */
-    new_env[count] = new_var;
-    new_env[count + 1] = NULL;
-    /* 6. Replace environment */
+    
+    // Add new entry
+    char **new_env = ft_calloc(i + 2, sizeof(char *));
+    if (!new_env) {
+        free(new_entry);
+        return 0;
+    }
+    
+    for (int j = 0; j < i; j++) new_env[j] = (*env)[j];
+    new_env[i] = new_entry;
     free(*env);
     *env = new_env;
-    return (1);
+    return 1;
 }
 
-char	*get_env_value(const char *name, char **envp)
+char *get_env_value(const char *name, char **envp)
 {
-	int		i;
-	size_t	name_len;
+    if (!name || !envp) return NULL;
+    size_t name_len = ft_strlen(name);
 
-	if (!name || !envp)
-		return (NULL);
-	name_len = ft_strlen(name);
-	i = -1;
-	while (envp[++i])
-	{
-		if (ft_strncmp(envp[i], name, name_len) == 0 
-			&& envp[i][name_len] == '=')
-			return (envp[i] + name_len + 1);
-	}
-	return (NULL);
+    // Handle empty environment case
+    if (!*envp) return NULL;
+    
+    for (int i = 0; envp[i]; i++) {
+        if (ft_strncmp(envp[i], name, name_len) == 0 && 
+            envp[i][name_len] == '=') 
+        {
+            return envp[i] + name_len + 1;
+        }
+    }
+    return NULL;
 }
 
-static int	expand_var(char **buf, size_t *j, const char *input, char **envp)
+static size_t extract_var_name(const char *input, char *buf, size_t buf_size)
 {
-	size_t	var_len;
-	char	*var_value;
-	char	var_name[256];
+    size_t len = 0;
+    
+    if (input[0] == '?') {  // Special $? case
+        buf[0] = '?';
+        buf[1] = '\0';
+        return 1;
+    }
+    
+    // Handle invalid variable names
+    if (!ft_isalpha(input[0]) && input[0] != '_') {
+        buf[0] = '\0';
+        return 0;
+    }
 
-	var_len = 0;
-	while (ft_isalnum(input[var_len]) || input[var_len] == '_')
-		var_len++;
-	ft_strlcpy(var_name, input, var_len + 1);
-	var_value = get_env_value(var_name, envp);
-	if (var_value)
-	{
-		while (*var_value)
-			(*buf)[(*j)++] = *var_value++;
-	}
-	return (var_len);
+    while (len < buf_size - 1 && 
+          (ft_isalnum(input[len]) || input[len] == '_')) 
+    {
+        buf[len] = input[len];
+        len++;
+    }
+    buf[len] = '\0';
+    return len;
 }
 
-char		*expand_env_vars(const char *input, char **envp)
+char *expand_env_vars(const char *input, char **envp, int exit_status)
 {
-	char	*result;
-	char	*buffer;
-	size_t	i;
-	size_t	j;
-
-	if (!input || !envp)
-		return (NULL);
-	buffer = ft_calloc(ft_strlen(input) * 2 + 1, sizeof(char));
-	if (!buffer)
-		return (NULL);
-	i = 0;
-	j = 0;
-	while (input[i])
-	{
-		if (input[i] == '$' && (ft_isalpha(input[i + 1]) || input[i + 1] == '_'))
-			i += expand_var(&buffer, &j, input + i + 1, envp) + 1;
-		else
-			buffer[j++] = input[i++];
-	}
-	result = ft_strdup(buffer);
-	free(buffer);
-	return (result);
+    if (!input) return NULL;
+    
+    // First pass: calculate required length
+    size_t len = 0;
+    for (size_t i = 0; input[i]; ) {
+        if (input[i] == '$' && input[i+1]) {
+            // Handle $? special case
+            if (input[i+1] == '?') {
+                // Calculate length of exit status
+                char status_str[12];
+                int num_len = snprintf(status_str, sizeof(status_str), "%d", exit_status);
+                len += num_len;
+                i += 2;  // Skip $?
+            } 
+            // Handle valid variables
+            else if (ft_isalpha(input[i+1]) || input[i+1] == '_') {
+                char var_name[128];
+                size_t var_len = extract_var_name(input + i + 1, var_name, sizeof(var_name));
+                char *value = get_env_value(var_name, envp);
+                if (value) len += ft_strlen(value);
+                i += 1 + var_len;
+            }
+            // Handle invalid variables - preserve the $
+            else {
+                len += 1; // Count the $ character
+                i++;      // Move to next character
+            }
+        } else {
+            len++;
+            i++;
+        }
+    }
+    
+    // Allocate output buffer
+    char *output = ft_calloc(len + 1, 1);
+    if (!output) return NULL;
+    
+    // Second pass: build output
+    size_t out_pos = 0;
+    for (size_t i = 0; input[i]; ) {
+        if (input[i] == '$' && input[i+1]) {
+            // Handle $? special case
+            if (input[i+1] == '?') {
+                char status_str[12];
+                int num_len = snprintf(status_str, sizeof(status_str), "%d", exit_status);
+                ft_strlcpy(output + out_pos, status_str, len - out_pos + 1);
+                out_pos += num_len;
+                i += 2;
+            } 
+            // Handle valid variables
+            else if (ft_isalpha(input[i+1]) || input[i+1] == '_') {
+                char var_name[128];
+                size_t var_len = extract_var_name(input + i + 1, var_name, sizeof(var_name));
+                char *value = get_env_value(var_name, envp);
+                if (value) {
+                    size_t val_len = ft_strlen(value);
+                    ft_strlcpy(output + out_pos, value, len - out_pos + 1);
+                    out_pos += val_len;
+                }
+                i += 1 + var_len;
+            }
+            // Handle invalid variables - preserve the $
+            else {
+                output[out_pos++] = input[i++];
+            }
+        } else {
+            output[out_pos++] = input[i++];
+        }
+    }
+    return output;
 }
+/*
+char *join_free(char *s1, char *s2)
+{
+    char *result = ft_strjoin(s1, s2);
+    if (s1) free(s1);
+    return result;
+}
+
+char *join_free_const(char *s1, const char *s2)
+{
+    char *result = ft_strjoin(s1, s2);
+    if (s1) free(s1);
+    return result;
+}
+
+void free_split(char **str)
+{
+    if (!str) return;
+    for (int i = 0; str[i]; i++) free(str[i]);
+    free(str);
+}*/

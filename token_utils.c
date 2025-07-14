@@ -11,235 +11,337 @@
 /* ************************************************************************** */
 
 #include "tokenization.h"
+#include "minishell.h"
+#include "env_utils.h"
 
-/*
- * Function to retrieve the value of an environment variable.
- * Searches the envp array for a match with the given variable name.
- * If found, returns the value part of the variable.
- */
-// static char	*get_env_value(const char *name, char **envp)
-// {
-// 	int		i;
-// 	size_t	name_len;
-
-// 	if (!name || !envp)
-// 		return (NULL);
-// 	name_len = ft_strlen(name);
-// 	i = 0;
-// 	while (envp[i] != NULL)
-// 	{
-// 		if (ft_strncmp(envp[i], name, name_len) == 0 && envp[i][name_len] == '=')
-// 		{
-// 			return (ft_strchr(envp[i], '=') + 1);
-// 		}
-// 		i++;
-// 	}
-// 	return (NULL);
-// }
-
-/*
- * Expands an environment variable in the string if it starts with '$'.
- * Returns the string with the variable expanded, or the original string if no expansion occurs.
- */
-char *expand_env_var(const char *str, char **envp)
-{
-	char *var_name;
-	char *value;
-	int len;
-
-	if (str == NULL || str[0] != '$')
-		return (ft_strdup(str));
-	len = 1;
-	while (str[len] && (ft_isalnum(str[len]) || str[len] == '_'))
-		len++;
-	var_name = ft_substr(str, 1, len - 1); // Extract variable name without '$'
-	if (var_name == NULL)
-		return (NULL);
-	value = get_env_value(var_name, envp); // Retrieve value from envp
-	free(var_name);
-	if (value == NULL)
-		return (ft_strdup("")); // Return empty string if variable not found
-	return (ft_strdup(value));
+// Helper function to remove all quotes from a string
+static char *remove_all_quotes(const char *str) {
+    if (!str) return NULL;
+    size_t len = ft_strlen(str);
+    char *result = malloc(len + 1);
+    if (!result) return NULL;
+    
+    size_t j = 0;
+    for (size_t i = 0; str[i]; i++) {
+        if (str[i] != '"' && str[i] != '\'') {
+            result[j++] = str[i];
+        }
+    }
+    result[j] = '\0';
+    return result;
 }
 
-/*
- * Safely appends the source string to the destination at position j.
- * Returns the new position after appending.
- */
-//static int	safe_strcpy(char *dst, const char *src, int j, int max_size)
-//{
-//	int	i;
-//
-//	i = 0;
-//	while (src[i] && j < max_size - 1)
-//	{
-//		dst[j] = src[i];
-//		i++;
-//		j++;
-//	}
-//	dst[j] = '\0';
-//	return (j);
-//}
+/* Helper to create redirection nodes */
+static t_redir *create_redir_node(t_redir_type type, char *raw_target, t_context *ctx) {
+    t_redir *new = ft_calloc(1, sizeof(t_redir));
+    if (!new) return NULL;
+    
+    new->type = type;
+    new->next = NULL;
+    
+	int heredoc_is_quoted = 0;
+    size_t raw_len = ft_strlen(raw_target);
+    if ((raw_target[0] == '"' && raw_target[raw_len - 1] == '"') ||
+        (raw_target[0] == '\'' && raw_target[raw_len - 1] == '\'')) {
+        heredoc_is_quoted = 1;
+    }
 
-/*
- * Processes double quotes in a token string.
- * Expands environment variables and handles other special characters.
- */
-char *process_double_quotes(const char *token, char **envp)
-{
-	char *result;
-	char *temp;
-	int i;
-	int j;
-	int len;
-
-	i = 0;
-	j = 0;
-	len = ft_strlen(token);
-	result = (char *)malloc(len + 1); // Allocate memory for the result
-	if (result == NULL)
-		return (NULL);
-	i = 1; // Skip opening quote
-	while (i < len - 1) // Process everything between quotes
-	{
-		if (token[i] == '$') // Expand environment variable
-		{
-			temp = expand_env_var(&token[i], envp);
-			if (temp != NULL)
-			{
-				strcpy(&result[j], temp);
-				j += ft_strlen(temp);
-				free(temp);
-			}
-			while (token[i] && (ft_isalnum(token[i]) || token[i] == '_'))
-				i++;
-			i--; // Adjust for the loop increment
-		}
-		else
-		{
-			result[j++] = token[i];
-		}
-		i++;
-	}
-	result[j] = '\0';
-	return (result);
+    // Remove ALL quotes from redirection targets
+    char *stripped = remove_all_quotes(raw_target);
+    if (!stripped) {
+        free(new);
+        return NULL;
+    }
+    
+    // Expand variables except in single quotes
+    if (raw_target[0] != '\'') {
+        char *expanded = expand_env_vars(stripped, ctx->env, ctx->exit_status);
+        free(stripped);
+        new->target = expanded;
+    } else {
+        new->target = stripped;
+    }
+    
+    // Create pipe for heredocs
+    if (type == REDIR_HEREDOC) {
+		new->quoted = heredoc_is_quoted; 
+        if (pipe(new->heredoc_fd) < 0) {
+            perror("minishell: pipe");
+            free(new->target);
+            free(new);
+            return NULL;
+        }
+    }
+    return new;
 }
 
-/*
- * Handles single or double quotes in a token.
- * Removes surrounding quotes or expands environment variables if inside double quotes.
- */
-char	*handle_quotes(char *token, char **envp)
-{
-	size_t	len;
-	char	*content;
-	char	*expanded;
+/* Core tokenizer → AST builder */
+t_ast *tokenize_input(const char *input, t_context *ctx) {
+    t_ast *ast = ft_calloc(1, sizeof(t_ast));
+    if (!ast) return NULL;
+    
+    char **tokens = smart_split(input);
+    if (!tokens) {
+        free(ast);
+        return NULL;
+    }
 
-	if (!token)
-		return (NULL);
-	len = ft_strlen(token);
-	if (len >= 2 && token[0] == '\'' && token[len - 1] == '\'')
-	{
-		content = ft_substr(token, 1, len - 2);
-		return (content);
-	}
-	else if (len >= 2 && token[0] == '"' && token[len - 1] == '"')
-	{
-		content = ft_substr(token, 1, len - 2);
-		expanded = expand_env_vars(content, envp);
-		free(content);
-		return (expanded);
-	}
-	return (expand_env_vars(token, envp));
+    // Allocate args array (size = token count + 1)
+    int token_count = 0;
+    while (tokens[token_count]) token_count++;
+    ast->args = ft_calloc(token_count + 1, sizeof(char *));
+    if (!ast->args) {
+        free_split(tokens);
+        free(ast);
+        return NULL;
+    }
+
+    // Process tokens
+    int arg_i = 0;
+    t_redir **redir_tail = &ast->redirs;  // Pointer to last redir pointer
+    
+    for (int i = 0; tokens[i]; i++) {
+        if (ft_strcmp(tokens[i], "<<") == 0 && tokens[i+1]) {
+            t_redir *new = create_redir_node(REDIR_HEREDOC, tokens[++i], ctx);
+            if (new) {
+                *redir_tail = new;
+                redir_tail = &new->next;
+            }
+        }
+        else if (ft_strcmp(tokens[i], ">>") == 0 && tokens[i+1]) {
+            t_redir *new = create_redir_node(REDIR_APPEND, tokens[++i], ctx);
+            if (new) {
+                *redir_tail = new;
+                redir_tail = &new->next;
+            }
+        }
+        else if (ft_strcmp(tokens[i], ">") == 0 && tokens[i+1]) {
+            t_redir *new = create_redir_node(REDIR_OUT, tokens[++i], ctx);
+            if (new) {
+                *redir_tail = new;
+                redir_tail = &new->next;
+            }
+        }
+        else if (ft_strcmp(tokens[i], "<") == 0 && tokens[i+1]) {
+            t_redir *new = create_redir_node(REDIR_IN, tokens[++i], ctx);
+            if (new) {
+                *redir_tail = new;
+                redir_tail = &new->next;
+            }
+        }
+        else if (ft_strcmp(tokens[i], "|") == 0) {
+            // Skip pipe tokens
+            continue;
+        }
+        else {
+            // Handle quotes and expansion for command arguments
+            ast->args[arg_i] = handle_quotes(tokens[i], ctx);
+            if (!ast->args[arg_i]) {
+                // Quote error occurred, clean up and return
+                free_split(tokens);
+                free_ast(ast);
+                return NULL;
+            }
+            arg_i++;
+        }
+    }
+    
+    // Finalize command
+    ast->args[arg_i] = NULL;
+    if (arg_i > 0 && ast->args[0])
+        ast->command = ft_strdup(ast->args[0]);
+    
+    free_split(tokens);
+    
+    // Validate AST creation
+    if (!ast->command) {
+        free_ast(ast);
+        return NULL;
+    }
+    return ast;
 }
 
-/*
- * Tokenizes the input string into an abstract syntax tree (AST).
- * Handles commands, arguments, input/output redirection, and environment variable expansion.
- */
-t_ast *tokenize_input(const char *input, char **envp)
+/* Replaces $(...) with the result of executing the embedded command (optional) */
+char *handle_command_substitution(char *input, t_context *ctx)
 {
-	t_ast *ast;
-	char **token;
-	char **temp;
-	int i;
-	int arg_index;
+    char *start = ft_strnstr(input, "$(", ft_strlen(input));
+    if (!start)
+        return ft_strdup(input);  // No substitution
 
-	ast = (t_ast *)ft_calloc(sizeof(t_ast), 1);
-	if (!ast)
-		return (NULL);
-	temp = smart_split(input);
-	if (!temp)
-	{
-		free_ast(ast);
-		return (NULL);
-	}
-	i = 0;
-	token = temp;
-	while (token != NULL && *token != NULL)
-	{
-		i++;
-		token++;
-	}
-	free(temp); // why ?
-	ast->args = (char **)malloc(sizeof(char *) * (i + 1));
-	if (ast->args == NULL)
-	{
-		free_ast(ast);
-		return (NULL);
-	}
-	temp = smart_split(input);
-	if (temp == NULL)
-	{
-		free_ast(ast);
-		return (NULL);
-	}
-	arg_index = 0;
-	ast->count_in = 0; // DONE ! --> sent through the ast but still need to remove one variable for norminette
-	ast->count_out = 0; // DONE ! --> Note above !
-	token = temp;
-	ast->output_file = (char **)ft_calloc(sizeof(char *), i + 1);
-	ast->input_file = (char **)ft_calloc(sizeof(char *), i + 1);
-	if (!ast->output_file || !ast->input_file)
-	{
-		free_ast(ast);
-		return (NULL);
-	}
-	while (token != NULL && *token != NULL)
-	{
-		if (ft_strcmp(*token, ">") == 0)
-		{
-			token++;
-			if (token && *token)
-				ast->output_file[ast->count_out] = ft_strdup(*token);
-			ast->count_out++;
-			if (ast->flag == 1 || ast->flag == 3)
-				ast->flag = 3;
-			else
-				ast->flag = 2;
-		}
-		else if (ft_strcmp(*token, "<") == 0)
-		{
-			token++;
-			if (token && *token)
-				ast->input_file[ast->count_in] = ft_strdup(*token);
-			ast->count_in++;
-			if (ast->flag == 2 || ast->flag == 3)
-			ast->flag = 3;
-			else
-			ast->flag = 1;
-		}
-		else
-		{
-			ast->args[arg_index] = handle_quotes(*token, envp);
-			arg_index++;
-		}
-		token++;
-	}
-	ast->args[arg_index] = NULL;
-	if (arg_index > 0)
-		ast->command = ft_strdup(ast->args[0]);
+    char *open = start + 2;
+    char *end = ft_strchr(open, ')');  // avoids shadowing
+    if (!end)
+        return ft_strdup(input);  // Malformed, treat literally
 
-	free_split(temp);
-	return (ast);
+    // Extract subcommand
+    size_t cmd_len = end - open;
+    char *subcmd = ft_substr(open, 0, cmd_len);
+    if (!subcmd)
+        return ft_strdup(input);
+
+    // Pipe setup
+    int pipefd[2];
+    if (pipe(pipefd) < 0) {
+        perror("minishell: pipe");
+        free(subcmd);
+        return ft_strdup(input);
+    }
+
+    pid_t pid = fork();
+    if (pid < 0) {
+        perror("minishell: fork");
+        free(subcmd);
+        close(pipefd[0]);
+        close(pipefd[1]);
+        return ft_strdup(input);
+    }
+
+    if (pid == 0) {
+        // Child: redirect stdout to pipe
+        close(pipefd[0]);
+        dup2(pipefd[1], STDOUT_FILENO);
+        close(pipefd[1]);
+
+        t_ast *ast = tokenize_input(subcmd, ctx);
+        if (ast && ast->command)
+			exec_command(ast, ctx);
+        free_ast(ast);
+        exit(0);
+    }
+
+    // Parent: read from pipe
+    close(pipefd[1]);
+    char buffer[4096];
+    ssize_t bytes_read = read(pipefd[0], buffer, sizeof(buffer) - 1);
+    close(pipefd[0]);
+    waitpid(pid, NULL, 0);
+
+    buffer[(bytes_read > 0) ? bytes_read : 0] = '\0';
+    free(subcmd);
+
+    // Assemble final result string
+    size_t prefix_len = start - input;
+    //size_t suffix_len = ft_strlen(end + 1);
+
+    char *prefix = ft_substr(input, 0, prefix_len);
+    char *suffix = ft_strdup(end + 1);
+    char *mid = ft_strtrim(buffer, "\n");
+
+    char *partial = ft_strjoin(prefix, mid);
+    char *final = ft_strjoin(partial, suffix);
+
+    free(prefix);
+    free(suffix);
+    free(mid);
+    free(partial);
+
+    return final;
+}
+
+
+/* Updated quote handling with context and error detection */
+char *handle_quotes(char *token, t_context *ctx)
+{
+    if (!token)
+        return NULL;
+
+    size_t len = ft_strlen(token);
+    if (len == 0)
+        return ft_strdup("");
+	
+	int is_fully_single_quoted = (token[0] == '\'' && token[len - 1] == '\'');
+    // Allocate buffer for cleaned result
+    char *result = ft_calloc(len + 1, sizeof(char));
+    if (!result)
+        return NULL;
+
+    size_t i = 0;
+    size_t j = 0;
+    int in_double_quotes = 0;
+    int in_single_quotes = 0;
+
+    while (i < len)
+    {
+        // Inside single quotes: treat all characters literally
+        if (in_single_quotes)
+        {
+            if (token[i] == '\'')
+            {
+                in_single_quotes = 0;
+                i++;
+                continue;
+            }
+            result[j++] = token[i++];
+            continue;
+        }
+
+        // Toggle quote states
+        if (token[i] == '"' && !in_single_quotes)
+        {
+            in_double_quotes = !in_double_quotes;
+            i++;
+            continue;
+        }
+        if (token[i] == '\'' && !in_double_quotes)
+        {
+            in_single_quotes = !in_single_quotes;
+            i++;
+            continue;
+        }
+
+        // Handle escape sequences inside double quotes
+        if (in_double_quotes && token[i] == '\\' && token[i + 1])
+        {
+            if (token[i + 1] == '"' || token[i + 1] == '\\' || token[i + 1] == '$')
+            {
+                result[j++] = token[i + 1]; // Push escaped char
+                i += 2;
+                continue;
+            }
+            else
+            {
+                result[j++] = token[i]; // Preserve backslash
+                i++;
+                continue;
+            }
+        }
+
+        // Default character handling
+        result[j++] = token[i++];
+    }
+
+    result[j] = '\0';
+
+    // Unmatched quote detection
+    if (in_double_quotes || in_single_quotes)
+    {
+        ft_putstr_fd("minishell: error: unmatched quote\n", STDERR_FILENO);
+        ctx->exit_status = 2;
+        free(result);
+        return NULL;
+    }
+
+    // Expand environment variables unless inside single quotes
+    if (!is_fully_single_quoted) {
+		char *substituted = handle_command_substitution(result, ctx);
+		char *expanded = expand_env_vars(substituted, ctx->env, ctx->exit_status);
+		free(result);
+		free(substituted);
+		return expanded;
+	}
+	return result;
+	
+}
+
+/* Double quote processing now uses context */
+char *process_double_quotes(const char *token, t_context *ctx) {
+    size_t len = ft_strlen(token);
+    if (len < 2) return ft_strdup("");
+    
+    char *inner = ft_substr(token, 1, len - 2);
+    if (!inner) return NULL;
+    
+    char *expanded = expand_env_vars(inner, ctx->env, ctx->exit_status);
+    free(inner);
+    return expanded;
 }

@@ -11,82 +11,239 @@
 /* ************************************************************************** */
 
 #include "minishell.h"
+#include "signals.h"
 
-/* Detect and execute builtin commands */
-int handle_builtin(char **args, char ***shell_env)
+// Returns builtin type
+t_builtin get_builtin_type(const char *cmd)
 {
-    if (!args[0])
-        return (0);
-    if (ft_strcmp(args[0], "exit") == 0)
-        return (builtin_exit(args));
-    else if (ft_strcmp(args[0], "cd") == 0)
-        return (builtin_cd(args, shell_env));
-    else if (ft_strcmp(args[0], "env") == 0)
-        return (builtin_env(*shell_env));
-    else if (ft_strcmp(args[0], "pwd") == 0)
-        return (builtin_pwd());
-    else if (ft_strcmp(args[0], "echo") == 0)
-        return (builtin_echo(args));
-    else if (ft_strcmp(args[0], "export") == 0)
-        return (builtin_export(args, shell_env));
-    else if (ft_strcmp(args[0], "unset") == 0)
-        return (builtin_unset(args, shell_env));
-    return (0);
+    if (!cmd) return NOT_BUILTIN;
+    if (!ft_strcmp(cmd, "cd") || !ft_strcmp(cmd, "export") ||
+        !ft_strcmp(cmd, "unset") || !ft_strcmp(cmd, "exit"))
+        return PARENT_BUILTIN;
+    if (!ft_strcmp(cmd, "echo") || !ft_strcmp(cmd, "pwd") || 
+        !ft_strcmp(cmd, "env"))
+        return CHILD_BUILTIN;
+    return NOT_BUILTIN;
 }
 
-/* Main entry point of the minishell */
+/*
+** Split `line` on unquoted '|' into a NULL-terminated array,
+** trimming whitespace around each segment.
+*/
+char    **split_on_pipe(const char *line)
+{
+    size_t  len = ft_strlen(line);
+    char    **parts;
+    size_t  count;
+    size_t  cap;
+    size_t  start;
+    char    quote;
+    size_t  i;
+
+    cap   = 8;
+    count = 0;
+    parts = malloc(sizeof(*parts) * cap);
+    if (!parts)
+        return (NULL);
+    start = 0;
+    quote = 0;
+    for (i = 0; i <= len; ++i)
+    {
+        if ((line[i] == '"' || line[i] == '\'') && !quote)
+            quote = line[i];
+        else if (line[i] == quote)
+            quote = 0;
+        if ((!quote && (line[i] == '|' || line[i] == '\0')))
+        {
+            size_t  a = start;
+            size_t  seglen = i - start;
+            while (seglen && ft_isspace((unsigned char)line[a]))
+            {
+                ++a;
+                --seglen;
+            }
+            while (seglen && ft_isspace((unsigned char)line[a + seglen - 1]))
+                --seglen;
+            parts[count++] = ft_substr(line, a, seglen);
+            if (count + 1 >= cap) {
+                char **new_parts = realloc(parts, sizeof(*parts) * cap * 2);
+                if (!new_parts) {
+                    free_split(parts);
+                    return NULL;
+                }
+                parts = new_parts;
+                cap *= 2;
+            }
+            start = i + 1;
+        }
+    }
+    parts[count] = NULL;
+    return (parts);
+}
+
+/* Process heredocs for all commands in pipeline */
+static void process_heredocs(t_ast *head, t_context *ctx)
+{
+    setup_heredoc_signals();
+    g_signal = 0;  // Reset signal flag before heredoc
+    
+    for (t_ast *node = head; node && !g_signal; node = node->next) {
+        for (t_redir *r = node->redirs; r; r = r->next) {
+            if (r->type != REDIR_HEREDOC) continue;
+            
+            char *line;
+            while (!g_signal) {
+                line = readline("> ");
+                if (!line) break;  // EOF
+                
+                if (ft_strcmp(line, r->target) == 0) {
+                    free(line);
+                    break;
+                }
+                
+                if (!r->quoted) {
+                    char *expanded = expand_env_vars(line, ctx->env, ctx->exit_status);
+                    write(r->heredoc_fd[1], expanded, strlen(expanded));
+                    write(r->heredoc_fd[1], "\n", 1);
+                    free(expanded);
+                } else {
+                    write(r->heredoc_fd[1], line, strlen(line));
+                    write(r->heredoc_fd[1], "\n", 1);
+                }
+                free(line);
+            }
+            close(r->heredoc_fd[1]);
+            r->heredoc_fd[1] = -1;
+            
+            if (g_signal) break;
+        }
+    }
+    setup_shell_signals();
+}
+
+int handle_builtin(char **args, t_context *ctx)
+{
+    if (!args[0] || !*args[0]) {  // Handle empty command
+        return 0;
+    }
+    
+    if (ft_strcmp(args[0], "exit") == 0)
+        return builtin_exit(args, ctx);
+    else if (ft_strcmp(args[0], "cd") == 0)
+        return builtin_cd(args, ctx);
+    else if (ft_strcmp(args[0], "env") == 0)
+        return builtin_env(ctx);  // FIXED: pass context
+    else if (!ft_strcmp(args[0], "pwd"))
+    {
+        /* If an extra argument is passed, error out like Bash */
+        if (args[1])
+        {
+            ft_putstr_fd("minishell: pwd: too many arguments\n", STDERR_FILENO);
+            ctx->exit_status = 1;
+            return 1;
+        }
+        return builtin_pwd(ctx);
+    }        
+    else if (ft_strcmp(args[0], "echo") == 0)
+        return builtin_echo(args, ctx);  // FIXED: pass context
+    else if (ft_strcmp(args[0], "export") == 0)
+        return builtin_export(args, ctx);
+    else if (ft_strcmp(args[0], "unset") == 0)
+        return builtin_unset(args, ctx);
+    
+    return 1;
+}
+
 int main(int argc, char **argv, char **envp)
 {
-    char    *input;
-    t_ast   *ast;
-    char    **shell_env; // shell's environment
+    t_context ctx = {
+        .env = copy_environment(envp),
+        .exit_status = 0
+    };
+    char *input;
+    t_ast *head = NULL;
+    int should_exit = 0;
 
     (void)argc;
     (void)argv;
-    shell_env = copy_environment(envp);
-    while (1)
-    {
-        /* Display prompt and read user input */
-        input = readline("$ [minishell] > ");
-        if (!input)
-        {
-            printf("exit\n");
-            break ;
-        }
-        if (*input)
-            add_history(input); 
-            // Place string at the end of the history list. The associated data field (if any) is set to NULL. 
-            // If the maximum number of history entries has been set using stifle_history(), 
-            // and the new number of history entries would exceed that maximum, the oldest history entry is removed.
-            // https://tiswww.case.edu/php/chet/readline/history.html
-        /* Tokenize input into AST */
-        ast = tokenize_input(input, shell_env);
-        if (ast && ast->command)
-        {
-            char *term;
-            int tmp_fd;
-            int i = 0;
+    setup_shell_signals();
 
-            term = ttyname(1); // callable service obtains the pathname of the terminal that is associated with the file descriptor.
-            /* If not a builtin, execute as external command */
-            handle_redirection(ast);
-            if (!handle_builtin(ast->args, &shell_env))
-                exec_command(ast, shell_env);
-            while (i < 3)
-            {
-                tmp_fd = open(term, O_RDWR);
-                if (tmp_fd < 0)
-                    return (perror("Error in reseting fd"), errno);
-                tmp_fd = dup2(tmp_fd, i);
-                if (tmp_fd < 0)
-                    return (perror("Error in reseting fd"), errno);
-                i++;
+    while (!should_exit)
+    {
+        g_signal = 0;
+        input = readline("$ [minishell] > ");
+        if (!input) {
+            ft_putendl_fd("exit", STDOUT_FILENO);
+            break;
+        }
+        
+        // Handle empty command
+        char *trimmed = ft_strtrim(input, " ");
+        if (!trimmed || !*trimmed) {
+            free(input);
+            free(trimmed);
+            ctx.exit_status = 0;
+            continue;
+        }
+        free(trimmed);
+
+        if (*input) add_history(input);
+        char **segments = split_on_pipe(input);
+        free(input);
+        if (!segments) continue;
+        
+        // Build AST pipeline
+        head = NULL;
+        t_ast *tail = NULL;
+        int parse_error = 0;
+        
+        for (int i = 0; segments[i]; i++) {
+            t_ast *node = tokenize_input(segments[i], &ctx);
+            if (!node) {
+                parse_error = 1;
+                break;
+            }
+            
+            if (!head) head = tail = node;
+            else tail->next = node, tail = node;
+        }
+        free_split(segments);
+        
+        if (parse_error) {
+            free_ast(head);
+            ctx.exit_status = 1;
+            continue;
+        }
+
+        // Process heredocs
+        if (head) {
+            process_heredocs(head, &ctx);
+            if (g_signal) {
+                ctx.exit_status = 130;
+                free_ast(head);
+                head = NULL;
+                continue;
             }
         }
-        /* Free allocated memory */
-        free_ast(ast);
-        free(input);
+
+        // Execute commands
+        if (head && head->command) {
+            t_builtin type = get_builtin_type(head->command);
+            
+            if (type == PARENT_BUILTIN && !head->next) {
+                int ret = handle_builtin(head->args, &ctx);
+                if (ret == 255) should_exit = 1;  // Exit builtin
+            } 
+            else {
+                if (head->next) execute_pipeline(head, &ctx);
+                else exec_command(head, &ctx);
+            }
+        }
+        
+        if (head) free_ast(head);
     }
-    free_environment(shell_env);
-    return (0);
+    
+    clear_history();
+    free_environment(ctx.env);
+    return ctx.exit_status;
 }
