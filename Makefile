@@ -32,7 +32,7 @@ OBJS        = $(SRCS:.c=.o)
 INCLUDES    = -I. -I$(LIBFT_INC)
 
 # Program-wide linker flags (link against readline and libft)
-LDLIBS      =  -ledit -lcurses $(LIBFT_LIB) #-lreadline for linux
+LDLIBS      =  -lreadline -lcurses $(LIBFT_LIB) #-ledit for linux
 
 .PHONY: all clean fclean re
 

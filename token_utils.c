@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   token_utils.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
+/*   By: anassih <anassih@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/29 18:29:11 by anassih           #+#    #+#             */
-/*   Updated: 2025/05/05 17:26:31 by anassih          ###   ########.fr       */
+/*   Updated: 2025/07/15 07:15:28 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,10 +22,13 @@ static char *remove_all_quotes(const char *str) {
     if (!result) return NULL;
     
     size_t j = 0;
-    for (size_t i = 0; str[i]; i++) {
+    size_t i = 0;
+    while (str[i])
+    {
         if (str[i] != '"' && str[i] != '\'') {
             result[j++] = str[i];
         }
+        i++;
     }
     result[j] = '\0';
     return result;
@@ -85,7 +88,6 @@ t_ast *tokenize_input(const char *input, t_context *ctx) {
         free(ast);
         return NULL;
     }
-
     // Allocate args array (size = token count + 1)
     int token_count = 0;
     while (tokens[token_count]) token_count++;
@@ -249,7 +251,7 @@ char *handle_quotes(char *token, t_context *ctx)
     if (len == 0)
         return ft_strdup("");
 	
-	int is_fully_single_quoted = (token[0] == '\'' && token[len - 1] == '\'');
+	  int is_fully_single_quoted = (token[0] == '\'' && token[len - 1] == '\'');
     // Allocate buffer for cleaned result
     char *result = ft_calloc(len + 1, sizeof(char));
     if (!result)

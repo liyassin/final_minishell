@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cmd_exec.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
+/*   By: anassih <anassih@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/28 17:49:49 by anassih           #+#    #+#             */
-/*   Updated: 2025/05/05 16:49:19 by anassih          ###   ########.fr       */
+/*   Updated: 2025/07/15 07:04:45 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -242,7 +242,6 @@ void exec_command(t_ast *ast, t_context *ctx)
         if (handle_redirection(ast) < 0) {
             exit(EXIT_FAILURE);
         }
-        
         // Handle builtins
         t_builtin type = get_builtin_type(ast->args[0]);
         if (type != NOT_BUILTIN) {
@@ -277,15 +276,19 @@ void exec_command(t_ast *ast, t_context *ctx)
 }
 
 // Execute pipeline
-void execute_pipeline(t_ast *ast, t_context *ctx)
+void    execute_pipeline(t_ast *ast, t_context *ctx)
 {
     if (!ast || !ctx) {
         return;
     }
-    
+    t_ast *it = ast;
     // Count pipeline stages
     int n = 0;
-    for (t_ast *it = ast; it; it = it->next) n++;
+    while (it)
+    {
+        n++;
+        it = it->next;
+    }
     if (n == 0) return;
     
     // Create pipes
@@ -312,12 +315,13 @@ void execute_pipeline(t_ast *ast, t_context *ctx)
     }
     
     t_ast *node = ast;
-    for (int i = 0; i < n; i++, node = node->next) {
+    int i = 0;
+    while (i < n)
+    {
         pids[i] = fork();
         
         if (pids[i] == 0) { // Child
             reset_default_signals();
-            
             // Connect pipes
             if (i > 0) {
                 dup2(pipes[i-1][0], STDIN_FILENO);
@@ -325,23 +329,20 @@ void execute_pipeline(t_ast *ast, t_context *ctx)
             if (i < n-1) {
                 dup2(pipes[i][1], STDOUT_FILENO);
             }
-            
             // Close all pipe FDs
-            for (int j = 0; j < n-1; j++) {
+            int j = 0;
+            while (j < n-1)
+            {
                 close(pipes[j][0]);
                 close(pipes[j][1]);
+                j++;
             }
-            
             // Apply redirections
-            if (handle_redirection(node) < 0) {
+            if (handle_redirection(node) < 0)
                 exit(EXIT_FAILURE);
-            }
-            
             // Handle empty command
-            if (!node->command || !*node->command) {
+            if (!node->command || !*node->command)
                 exit(0);
-            }
-
             // Handle builtins
             if (get_builtin_type(node->args[0]) != NOT_BUILTIN) {
                 int status = handle_builtin(node->args, ctx);
@@ -354,7 +355,7 @@ void execute_pipeline(t_ast *ast, t_context *ctx)
                 handle_command_not_found(node->command);
             }
             execve(path, node->args, ctx->env);
-            perror("minishell");
+            perror("minishell :");
             free(path);
             exit(126);
         }
@@ -362,6 +363,8 @@ void execute_pipeline(t_ast *ast, t_context *ctx)
             perror("minishell: fork");
             break;
         }
+        i++;
+        node = node->next;
     }
     
     // Parent: close all pipes

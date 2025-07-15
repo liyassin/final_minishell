@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/28 09:46:40 by anassih           #+#    #+#             */
-/*   Updated: 2025/05/05 16:37:17 by anassih          ###   ########.fr       */
+/*   Updated: 2025/07/15 06:41:26 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,8 @@ char    **split_on_pipe(const char *line)
         return (NULL);
     start = 0;
     quote = 0;
-    for (i = 0; i <= len; ++i)
+    i = 0;
+    while (i <= len)
     {
         if ((line[i] == '"' || line[i] == '\'') && !quote)
             quote = line[i];
@@ -76,12 +77,13 @@ char    **split_on_pipe(const char *line)
             }
             start = i + 1;
         }
+        ++i;
     }
     parts[count] = NULL;
     return (parts);
 }
 
-/* Process heredocs for all commands in pipeline */
+/* Process heredocs for all commands in p~/.config/nvim/lua/pluginsipeline */
 static void process_heredocs(t_ast *head, t_context *ctx)
 {
     setup_heredoc_signals();
@@ -128,7 +130,7 @@ int handle_builtin(char **args, t_context *ctx)
     }
     
     if (ft_strcmp(args[0], "exit") == 0)
-        return builtin_exit(args, ctx);
+      return (builtin_exit(args, ctx));
     else if (ft_strcmp(args[0], "cd") == 0)
         return builtin_cd(args, ctx);
     else if (ft_strcmp(args[0], "env") == 0)
@@ -138,9 +140,14 @@ int handle_builtin(char **args, t_context *ctx)
         /* If an extra argument is passed, error out like Bash */
         if (args[1])
         {
-            ft_putstr_fd("minishell: pwd: too many arguments\n", STDERR_FILENO);
-            ctx->exit_status = 1;
-            return 1;
+            char *cwd = getcwd(NULL, 0);
+            if (cwd)
+            {
+              printf("%s\n", cwd);
+              free(cwd);
+            }
+            ft_putstr_fd("minishell: pwd:\n", STDERR_FILENO);
+            return (ctx->exit_status = 1, 0);
         }
         return builtin_pwd(ctx);
     }        

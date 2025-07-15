@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/01 16:47:18 by anassih           #+#    #+#             */
-/*   Updated: 2025/05/06 16:14:51 by anassih          ###   ########.fr       */
+/*   Updated: 2025/07/15 06:39:32 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,8 +39,8 @@ int builtin_exit(char **args, t_context *ctx)
                 ft_putstr_fd("exit: ", STDERR_FILENO);
                 ft_putstr_fd(args[1], STDERR_FILENO);
                 ft_putstr_fd(": numeric argument required\n", STDERR_FILENO);
-                ctx->exit_status = 255;
-                return 255;  // Special code to indicate exit
+                ctx->exit_status = 2;
+                return 2;  // Special code to indicate exit
             }
         }
         
@@ -77,7 +77,6 @@ static char *resolve_cd_path(const char *path, t_context *ctx)
         ft_putstr_fd("minishell: cd: invalid tilde usage\n", STDERR_FILENO);
         return NULL;
     }
-    
     /* Absolute path */
     if (path[0] == '/')
         return ft_strdup(path);
@@ -132,14 +131,20 @@ int builtin_cd(char **args, t_context *ctx)
         }
         ft_putendl_fd(path, STDOUT_FILENO);
     }
-    else {
+    else if (args[2])
+    {
+      ft_putstr_fd("cd: too many arguments\n", STDERR_FILENO);
+      return (ctx->exit_status = 1, 0);
+    }
+    else
+    {
         path = args[1];
     }
 
     resolved_path = resolve_cd_path(path, ctx);
     if (resolved_path) {
         if (chdir(resolved_path) != 0) {
-            ft_putstr_fd("minishell: cd: ", STDERR_FILENO);
+            ft_putstr_fd("minishell: cd :", STDERR_FILENO);
             perror(resolved_path);
             status = 1;
         }

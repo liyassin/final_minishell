@@ -8,6 +8,7 @@
         "types.h": "c",
         "builtins.h": "c",
         "minishell.h": "c",
-        "token": "c"
+        "token": "c",
+        "env_utils.h": "c"
     }
 }
