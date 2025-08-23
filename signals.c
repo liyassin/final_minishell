@@ -3,14 +3,14 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 
-volatile sig_atomic_t g_signal = 0;
+volatile sig_atomic_t	g_signal = 0;
 
 static void	handle_sigint(int sig)
 {
 	g_signal = sig;
 	write(STDOUT_FILENO, "\n", 1);
 	rl_on_new_line();
-    //rl_replace_line("", 0); // commented it out just because it's not working on my mac
+	//rl_replace_line("", 0); // commented it out just because it's not working on my mac
 	rl_redisplay();
 }
 
@@ -39,9 +39,8 @@ void	setup_heredoc_signals(void)
 	sigemptyset(&sa_int.sa_mask);
 	sa_int.sa_flags = SA_RESTART;
 	sigaction(SIGINT, &sa_int, NULL);
-
-    // Adding SIGQUIT handling
-    signal(SIGQUIT, SIG_IGN);
+	// Adding SIGQUIT handling
+	signal(SIGQUIT, SIG_IGN);
 }
 
 void	reset_default_signals(void)

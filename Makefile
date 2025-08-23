@@ -1,82 +1,88 @@
 # ────────────────────────────────────────────────────────────────────────────
-# ROOT Makefile for MINISHELL
+# MINISHELL Makefile
 # ────────────────────────────────────────────────────────────────────────────
 
-# Name of the final executable
-NAME        = minishell
+NAME        := minishell
 
-# Compiler and flags
-CC          = cc
-CFLAGS      = -Wall -Wextra -Werror -g -fsanitize=address
+CC          := cc
+CFLAGS      := -Wall -Wextra -Werror -g -fsanitize=address
 
-# Directories
-LIBFT_DIR   = libft
-LIBFT_INC   = $(LIBFT_DIR)/inc
-LIBFT_LIB   = $(LIBFT_DIR)/libft.a
+# Libft
+LIBFT_DIR   := libft
+LIBFT_INC   := $(LIBFT_DIR)/inc
+LIBFT_LIB   := $(LIBFT_DIR)/libft.a
 
-# Minishell sources (all .c in root of MINISHELL/)
-SRCS        = \
-	builtins.c \
-	cleanup.c \
-	cmd_exec.c \
-	env_utils.c \
-	minishell.c \
-	smart_split.c \
-	token_utils.c \
-	signals.c
+INCLUDES    := -Iincludes -I$(LIBFT_INC)
+LDLIBS      := -lreadline -lcurses $(LIBFT_LIB)
 
-# Corresponding object files
-OBJS        = $(SRCS:.c=.o)
+# Sources grouped by directory
+PARSING_SRCS := \
+    parsing/ast_builder.c \
+    parsing/line_reader.c \
+    parsing/smart_split.c \
+    parsing/split_pipe.c \
+    parsing/ast_utils.c \
+    parsing/quotes.c \
+    parsing/split_context.c \
+    parsing/substitution.c \
+    parsing/heredoc.c \
+    parsing/redir_utils.c \
+    parsing/split_helpers.c
 
-# Include paths for Minishell and libft headers
-INCLUDES    = -I. -I$(LIBFT_INC)
+EXEC_SRCS := \
+    execution/builtin_type.c \
+    execution/builtin_dispatch.c \
+    execution/command_exec.c \
+    execution/command_errors.c \
+    execution/executor.c \
+    execution/main.c \
+    execution/path_resolver.c \
+    execution/pipeline_setup.c \
+    execution/pipeline_executor.c \
+    execution/redirections.c
 
-# Program-wide linker flags (link against readline and libft)
-LDLIBS      =  -lreadline -lcurses $(LIBFT_LIB) #-ledit for linux
+BUILTIN_SRCS := \
+    builtins/cd.c \
+    builtins/exit.c \
+    builtins/child_builtins.c \
+    builtins/export.c \
+    builtins/unset.c \
+    builtins/utils.c
 
-.PHONY: all clean fclean re
+ENV_SRCS := \
+    env_utils/env_array.c \
+    env_utils/env_expand_build.c \
+    env_utils/env_expand_len.c \
+    env_utils/env_utils.c
 
-# ────────────────────────────────────────────────────────────────────────────
-#  Default target: build libft first, then minishell
-# ────────────────────────────────────────────────────────────────────────────
-all: $(LIBFT_LIB) $(NAME)
+ROOT_SRCS := \
+    signals.c \
+    cleanup.c
 
-# ────────────────────────────────────────────────────────────────────────────
-#  Link rule for minishell
-# ────────────────────────────────────────────────────────────────────────────
+# All sources and objects
+SRCS := $(PARSING_SRCS) $(EXEC_SRCS) $(BUILTIN_SRCS) $(ENV_SRCS) $(ROOT_SRCS)
+OBJS := $(SRCS:.c=.o)
+
+.PHONY: all clean fclean re libft
+
+all: libft $(NAME)
+
+libft:
+	$(MAKE) -C $(LIBFT_DIR)
+
 $(NAME): $(OBJS) $(LIBFT_LIB)
-	$(CC) $(CFLAGS) $(INCLUDES) $(OBJS) $(LDLIBS) -o $(NAME)
+	$(CC) $(CFLAGS) $(INCLUDES) $(OBJS) $(LDLIBS) -o $@
 
-# ────────────────────────────────────────────────────────────────────────────
-#  Compile each .c → .o (Minishell sources)
-# ────────────────────────────────────────────────────────────────────────────
-#  Note: if you add more .c files under MINISHELL/, just update SRCS.
+# Compile rule: .c → .o
 %.o: %.c
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
-# ────────────────────────────────────────────────────────────────────────────
-#  Build the libft library by delegating to its own Makefile
-# ────────────────────────────────────────────────────────────────────────────
-$(LIBFT_LIB):
-	@$(MAKE) -C $(LIBFT_DIR)
-
-# ────────────────────────────────────────────────────────────────────────────
-#  Remove object files and invoke libft's clean
-# ────────────────────────────────────────────────────────────────────────────
 clean:
-	@$(RM) $(OBJS)
-	@$(MAKE) -C $(LIBFT_DIR) clean
+	rm -f $(OBJS)
+	$(MAKE) -C $(LIBFT_DIR) clean
 
-# ────────────────────────────────────────────────────────────────────────────
-#  Full cleanup: remove minishell binary and libft artifacts
-# ────────────────────────────────────────────────────────────────────────────
 fclean: clean
-	@$(RM) $(NAME)
-	@$(MAKE) -C $(LIBFT_DIR) fclean
+	rm -f $(NAME)
+	$(MAKE) -C $(LIBFT_DIR) fclean
 
-# ────────────────────────────────────────────────────────────────────────────
-#  Rebuild everything from scratch
-# ────────────────────────────────────────────────────────────────────────────
 re: fclean all
-
-.PHONY: all bonus clean fclean re
