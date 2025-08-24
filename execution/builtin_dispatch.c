@@ -1,5 +1,17 @@
-#include "minishell.h"
-#include "signals.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   builtin_dispatch.c                                 :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/08/23 18:17:47 by anassih           #+#    #+#             */
+/*   Updated: 2025/08/23 18:18:05 by anassih          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "../includes/minishell.h"
+#include "../includes/signals.h"
 
 int	handle_builtin(char **args, t_context *ctx)
 {

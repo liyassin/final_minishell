@@ -1,4 +1,16 @@
-#include "env_utils.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   env_expand_len.c                                   :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/08/23 18:18:23 by anassih           #+#    #+#             */
+/*   Updated: 2025/08/23 18:18:51 by anassih          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "../includes/env_utils.h"
 #include <libft.h>
 
 size_t	extract_var_name(const char *input, char *buf, size_t buf_size)

@@ -1,38 +1,46 @@
-#include "minishell.h"
-#include "signals.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   command_errors.c                                   :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/08/23 18:17:15 by anassih           #+#    #+#             */
+/*   Updated: 2025/08/23 18:17:25 by anassih          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-void	handle_command_not_found(char *cmd)
+#include "../includes/minishell.h"
+#include "../includes/signals.h"
+
+static void	print_and_exit(char *cmd, char *msg, int code, int should_free)
+{
+	ft_putstr_fd("minishell: ", STDERR_FILENO);
+	if (cmd)
+		ft_putstr_fd(cmd, STDERR_FILENO);
+	ft_putstr_fd(msg, STDERR_FILENO);
+	if (should_free)
+		free(cmd);
+	exit(code);
+}
+
+// Handles errors for commands with '/' in their name
+static void	handle_slash_error(char *cmd)
 {
 	struct stat	st;
 
+	if (stat(cmd, &st) == 0 && S_ISDIR(st.st_mode))
+		print_and_exit(cmd, ": is a directory\n", 126, 0);
+	if (access(cmd, F_OK) == 0)
+		print_and_exit(cmd, ": Permission denied\n", 126, 0);
+	print_and_exit(cmd, ": No such file or directory\n", 127, 0);
+}
+
+void	handle_command_not_found(char *cmd)
+{
 	if (!cmd || !*cmd)
-	{
-		ft_putstr_fd("minishell: : command not found\n", STDERR_FILENO);
-		exit(127);
-	}
+		print_and_exit(NULL, ": command not found\n", 127, 0);
 	if (ft_strchr(cmd, '/'))
-	{
-		if (stat(cmd, &st) == 0 && S_ISDIR(st.st_mode))
-		{
-			ft_putstr_fd("minishell: ", STDERR_FILENO);
-			ft_putstr_fd(cmd, STDERR_FILENO);
-			ft_putstr_fd(": is a directory\n", STDERR_FILENO);
-			exit(126);
-		}
-		if (access(cmd, F_OK) == 0)
-		{
-			ft_putstr_fd("minishell: ", STDERR_FILENO);
-			ft_putstr_fd(cmd, STDERR_FILENO);
-			ft_putstr_fd(": Permission denied\n", STDERR_FILENO);
-			exit(126);
-		}
-		ft_putstr_fd("minishell: ", STDERR_FILENO);
-		ft_putstr_fd(cmd, STDERR_FILENO);
-		ft_putstr_fd(": No such file or directory\n", STDERR_FILENO);
-		exit(127);
-	}
-	ft_putstr_fd("minishell: ", STDERR_FILENO);
-	ft_putstr_fd(cmd, STDERR_FILENO);
-	ft_putstr_fd(": command not found\n", STDERR_FILENO);
-	exit(127);
+		handle_slash_error(cmd);
+	print_and_exit(cmd, ": command not found\n", 127, 1);
 }

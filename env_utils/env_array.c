@@ -1,4 +1,16 @@
-#include "env_utils.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   env_array.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/08/23 18:18:09 by anassih           #+#    #+#             */
+/*   Updated: 2025/08/24 00:51:00 by anassih          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "../includes/env_utils.h"
 
 char	**copy_environment(char **envp)
 {
@@ -21,6 +33,7 @@ char	**copy_environment(char **envp)
 		if (!env_copy[i])
 		{
 			free_split(env_copy);
+			cleanup_shell(NULL, NULL);
 			return (NULL);
 		}
 		i++;

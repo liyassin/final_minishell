@@ -1,5 +1,17 @@
-#include "minishell.h"
-#include "signals.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ast_builder.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/08/23 18:14:19 by anassih           #+#    #+#             */
+/*   Updated: 2025/08/23 18:14:33 by anassih          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "../includes/minishell.h"
+#include "../includes/signals.h"
 
 static t_ast	*build_pipeline_list(char **segments, t_context *ctx)
 {

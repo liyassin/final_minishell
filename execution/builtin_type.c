@@ -1,5 +1,17 @@
-#include "minishell.h"
-#include "signals.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   builtin_type.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/08/23 18:17:32 by anassih           #+#    #+#             */
+/*   Updated: 2025/08/23 18:17:43 by anassih          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "../includes/minishell.h"
+#include "../includes/signals.h"
 
 // Returns builtin type
 t_builtin	get_builtin_type(const char *cmd)

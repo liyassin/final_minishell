@@ -1,4 +1,16 @@
-#include "env_utils.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   env_expand_build.c                                 :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/08/23 18:19:33 by anassih           #+#    #+#             */
+/*   Updated: 2025/08/23 18:19:41 by anassih          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "../includes/env_utils.h"
 #include <libft.h>
 
 size_t	copy_dollar_seq(const char *in, char **envp, int exit_status, char *out, size_t *skip)

@@ -1,7 +1,18 @@
-#include "tokenization.h"
-#include <libft.h>
-#include <stdbool.h>
-#include <stdlib.h>
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   split_context.c                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/08/23 18:12:30 by anassih           #+#    #+#             */
+/*   Updated: 2025/08/23 18:12:31 by anassih          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "../includes/minishell.h"
+#include "../includes/tokenization.h"
+#include "../includes/env_utils.h"
 
 void	init_ctx(t_split_ctx *ctx)
 {

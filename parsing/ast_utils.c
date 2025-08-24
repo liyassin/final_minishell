@@ -1,6 +1,18 @@
-#include "env_utils.h"
-#include "minishell.h"
-#include "tokenization.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ast_utils.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/08/23 18:14:09 by anassih           #+#    #+#             */
+/*   Updated: 2025/08/23 21:51:59 by anassih          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "../includes/minishell.h"
+#include "../includes/tokenization.h"
+#include "../includes/env_utils.h"
 
 t_ast	*alloc_ast(char **tokens)
 {
@@ -110,8 +122,11 @@ t_ast	*tokenize_input(const char *input, t_context *ctx)
 		return (free_split(tokens), (t_ast *) NULL);
 	fill_redirections(ast, tokens, ctx);
 	ok = fill_args(ast, tokens, ctx);
+	// If no args/command but heredoc redir exists, keep AST node
+	if (!ok && ast->redirs && ast->redirs->type == REDIR_HEREDOC)
+		ok = 1;
 	free_split(tokens);
-	if (!ok || !ast->command)
-		return (free_ast(ast), (t_ast *) NULL);
+	if (!ok || (!ast->command && !ast->redirs))
+		return (cleanup_shell(ast, ctx), (t_ast *) NULL);
 	return (ast);
 }

@@ -1,5 +1,17 @@
-#include "minishell.h"
-#include "signals.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/08/23 18:16:18 by anassih           #+#    #+#             */
+/*   Updated: 2025/08/24 00:51:00 by anassih          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "../includes/minishell.h"
+#include "../includes/signals.h"
 
 int	main(int argc, char **argv, char **envp)
 {
@@ -26,13 +38,12 @@ int	main(int argc, char **argv, char **envp)
 		if (g_signal)
 		{
 			ctx.exit_status = 130;
-			free_ast(head);
+			cleanup_shell(head, &ctx);
 			continue ;
 		}
 		execute_if_needed(head, &ctx, &should_exit);
 		free_ast(head);
 	}
-	clear_history();
-	free_environment(ctx.env);
+	cleanup_shell(NULL, &ctx);
 	return (ctx.exit_status);
 }

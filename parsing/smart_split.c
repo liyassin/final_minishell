@@ -1,7 +1,18 @@
-#include "tokenization.h"
-#include <libft.h>
-#include <stdbool.h>
-#include <stdlib.h>
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   smart_split.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/08/23 18:12:38 by anassih           #+#    #+#             */
+/*   Updated: 2025/08/23 18:12:39 by anassih          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "../includes/minishell.h"
+#include "../includes/tokenization.h"
+#include "../includes/env_utils.h"
 
 static char	**split_loop(const char *input)
 {

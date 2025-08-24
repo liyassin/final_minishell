@@ -6,14 +6,13 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/28 17:27:55 by anassih           #+#    #+#             */
-/*   Updated: 2025/07/16 14:29:32 by liyassin         ###   ########.fr       */
+/*   Updated: 2025/08/23 21:47:54 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
-#include "tokenization.h"
-#include "env_utils.h"
-#include <unistd.h>
+#include "../includes/minishell.h"
+#include "../includes/tokenization.h"
+#include "../includes/env_utils.h"
 
 // Concatenate s1 + s2, free s1, return the new string.
 char	*join_free(char *s1, char *s2)
@@ -92,4 +91,12 @@ void	free_ast(t_ast *ast)
 		free(current);
 		current = next;
 	}
+}
+void cleanup_shell(t_ast *ast, t_context *ctx)
+{
+    if (ast)
+        free_ast(ast);
+    if (ctx && ctx->env)
+        free_environment(ctx->env);
+    clear_history();
 }

@@ -1,5 +1,17 @@
-#include "builtins.h"
-#include "minishell.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   export.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/08/23 16:38:10 by anassih           #+#    #+#             */
+/*   Updated: 2025/08/23 18:20:37 by anassih          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "../includes/builtins.h"
+#include "../includes/minishell.h"
 
 // Print all exported vars in the form:
 // declare -x NAME="value"

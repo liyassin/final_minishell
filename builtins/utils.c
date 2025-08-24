@@ -1,5 +1,17 @@
-#include "builtins.h"
-#include "minishell.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   utils.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/08/23 18:19:48 by anassih           #+#    #+#             */
+/*   Updated: 2025/08/23 18:19:57 by anassih          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "../includes/builtins.h"
+#include "../includes/minishell.h"
 
 // Validate identifier for export/unset: [A-Za-z_][A-Za-z0-9_]*.
 int	is_valid_identifier(const char *name)

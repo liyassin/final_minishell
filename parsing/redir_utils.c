@@ -1,6 +1,18 @@
-#include "env_utils.h"
-#include "minishell.h"
-#include "tokenization.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   redir_utils.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/08/23 18:12:53 by anassih           #+#    #+#             */
+/*   Updated: 2025/08/23 18:12:57 by anassih          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "../includes/minishell.h"
+#include "../includes/tokenization.h"
+#include "../includes/env_utils.h"
 
 // Helper function to remove all quotes from a string
 char	*remove_all_quotes(const char *str)

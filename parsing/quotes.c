@@ -1,6 +1,18 @@
-#include "env_utils.h"
-#include "minishell.h"
-#include "tokenization.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   quotes.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/08/23 18:13:02 by anassih           #+#    #+#             */
+/*   Updated: 2025/08/23 18:13:07 by anassih          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "../includes/minishell.h"
+#include "../includes/tokenization.h"
+#include "../includes/env_utils.h"
 
 static char	*strip_and_validate_quotes(char *token, int *error)
 {

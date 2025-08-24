@@ -1,5 +1,17 @@
-#include "builtins.h"
-#include "minishell.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   unset.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/08/23 18:20:01 by anassih           #+#    #+#             */
+/*   Updated: 2025/08/23 18:20:14 by anassih          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "../includes/builtins.h"
+#include "../includes/minishell.h"
 
 //Remove one variable NAME from env array if present.
 static void	remove_env_var(char **env, const char *name)

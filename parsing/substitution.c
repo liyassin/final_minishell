@@ -1,6 +1,18 @@
-#include "tokenization.h"
-#include "minishell.h"
-#include "env_utils.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   substitution.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/08/23 18:12:09 by anassih           #+#    #+#             */
+/*   Updated: 2025/08/23 18:12:10 by anassih          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "../includes/minishell.h"
+#include "../includes/tokenization.h"
+#include "../includes/env_utils.h"
 
 // Find the next "$(" ... ")" range. Returns 1 if found, 0 otherwise.
 static int	find_substitution_range(const char *input, char **open, char **end)

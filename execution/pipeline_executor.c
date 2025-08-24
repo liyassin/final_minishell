@@ -1,5 +1,17 @@
-#include "minishell.h"
-#include "signals.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   pipeline_executor.c                                :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/08/23 18:15:30 by anassih           #+#    #+#             */
+/*   Updated: 2025/08/23 18:15:50 by anassih          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "../includes/minishell.h"
+#include "../includes/signals.h"
 
 // Execute one AST node in child: redirs, builtins, or external.
 static void	exec_node(t_ast *node, t_context *ctx)
@@ -24,7 +36,8 @@ static void	exec_node(t_ast *node, t_context *ctx)
 }
 
 // Fork each stage: child sets up pipes and exec_node(), parent records pid.
-static int	fork_children(t_ast *ast, t_context *ctx, int n, int pipes[][2], pid_t *pids)
+static int	fork_children(t_ast *ast, t_context *ctx,
+	int n, int pipes[][2], pid_t *pids)
 {
 	t_ast	*node;
 	int		i;
@@ -42,7 +55,11 @@ static int	fork_children(t_ast *ast, t_context *ctx, int n, int pipes[][2], pid_
 			exec_node(node, ctx);
 		}
 		else if (pids[i] < 0)
-			return (perror("minishell: fork"), -1);
+		{
+			ctx->exit_status = 1;
+			perror("minishell: fork");
+			return (-1);
+		}
 		i++;
 		node = node->next;
 	}

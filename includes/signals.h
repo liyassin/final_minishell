@@ -8,5 +8,6 @@ extern volatile sig_atomic_t	g_signal;
 void	setup_shell_signals(void);
 void	setup_heredoc_signals(void);
 void	reset_default_signals(void);
+void	handle_sigint(int sig);
 
 #endif

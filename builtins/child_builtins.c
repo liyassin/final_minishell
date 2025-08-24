@@ -1,5 +1,17 @@
-#include "builtins.h"
-#include "minishell.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   child_builtins.c                                   :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/08/23 18:23:05 by anassih           #+#    #+#             */
+/*   Updated: 2025/08/23 18:23:16 by anassih          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "../includes/builtins.h"
+#include "../includes/minishell.h"
 
 // env builtin: print all VAR=VALUE entries.
 int	builtin_env(t_context *ctx)

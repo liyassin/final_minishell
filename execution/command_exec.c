@@ -1,8 +1,21 @@
-#include "minishell.h"
-#include "signals.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   command_exec.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/08/23 18:17:02 by anassih           #+#    #+#             */
+/*   Updated: 2025/08/23 18:17:09 by anassih          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "../includes/minishell.h"
+#include "../includes/signals.h"
+
 
 // Skip an initial empty command argument and shift args up.
-static void	skip_empty_command_args(t_ast *ast)
+static void skip_empty_command_args(t_ast *ast)
 {
 	char	*empty;
 	char	**new_args;
@@ -35,8 +48,7 @@ static void	skip_empty_command_args(t_ast *ast)
 	free(empty);
 }
 
-// In child: set signals, apply redirs, run builtin or external.
-static void	child_exec(t_ast *ast, t_context *ctx)
+static void child_exec(t_ast *ast, t_context *ctx)
 {
 	t_builtin	type;
 	int			status;
@@ -56,11 +68,8 @@ static void	child_exec(t_ast *ast, t_context *ctx)
 		handle_command_not_found(ast->command);
 	execve(path, ast->args, ctx->env);
 	perror("minishell");
-	free(path);
-	exit(126);
 }
 
-// Execute single command
 void	exec_command(t_ast *ast, t_context *ctx)
 {
 	pid_t	pid;
@@ -79,15 +88,26 @@ void	exec_command(t_ast *ast, t_context *ctx)
 	}
 	pid = fork();
 	if (pid == 0)
+	{
+		reset_default_signals();
 		child_exec(ast, ctx);
+	}
 	else if (pid > 0)
 	{
+		signal(SIGINT, SIG_IGN);
 		waitpid(pid, &status, 0);
+		setup_shell_signals();
 		if (WIFEXITED(status))
 			ctx->exit_status = WEXITSTATUS(status);
 		else if (WIFSIGNALED(status))
+		{
 			ctx->exit_status = 128 + WTERMSIG(status);
+			write(STDOUT_FILENO, "\n", 1);
+		}
 	}
 	else
+	{
+		ctx->exit_status = 1;
 		perror("minishell: fork");
+	}
 }
