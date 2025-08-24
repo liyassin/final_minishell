@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 18:17:02 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/23 18:17:09 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/24 18:05:08 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,8 +66,11 @@ static void child_exec(t_ast *ast, t_context *ctx)
 	path = find_command_path(ast->command, ctx);
 	if (!path)
 		handle_command_not_found(ast->command);
+	// If execve fails, free path before exit
 	execve(path, ast->args, ctx->env);
 	perror("minishell");
+	free(path);
+	exit(126);
 }
 
 void	exec_command(t_ast *ast, t_context *ctx)

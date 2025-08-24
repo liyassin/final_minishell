@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 18:16:18 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/24 00:51:00 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/23 19:23:24 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,12 +38,13 @@ int	main(int argc, char **argv, char **envp)
 		if (g_signal)
 		{
 			ctx.exit_status = 130;
-			cleanup_shell(head, &ctx);
+			free_ast(head);
 			continue ;
 		}
 		execute_if_needed(head, &ctx, &should_exit);
 		free_ast(head);
 	}
-	cleanup_shell(NULL, &ctx);
+	clear_history();
+	free_environment(ctx.env);
 	return (ctx.exit_status);
 }

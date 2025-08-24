@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 18:15:30 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/23 18:15:50 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/24 18:00:28 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,31 +39,30 @@ static void	exec_node(t_ast *node, t_context *ctx)
 static int	fork_children(t_ast *ast, t_context *ctx,
 	int n, int pipes[][2], pid_t *pids)
 {
-	t_ast	*node;
-	int		i;
 
-	node = ast;
-	i = 0;
-	while (i < n)
-	{
-		pids[i] = fork();
-		if (pids[i] == 0)
-		{
-			reset_default_signals();
-			setup_pipes(i, n, pipes);
-			close_pipes(n, pipes);
-			exec_node(node, ctx);
+		// Collect nodes in array for right-to-left forking
+		t_ast *nodes[n];
+		t_ast *cur = ast;
+		int idx = 0;
+		while (cur && idx < n) {
+			nodes[idx++] = cur;
+			cur = cur->next;
 		}
-		else if (pids[i] < 0)
-		{
-			ctx->exit_status = 1;
-			perror("minishell: fork");
-			return (-1);
+
+		for (int i = n - 1; i >= 0; i--) {
+			pids[i] = fork();
+			if (pids[i] == 0) {
+				reset_default_signals();
+				setup_pipes(i, n, pipes);
+				close_pipes(n, pipes);
+				exec_node(nodes[i], ctx);
+			} else if (pids[i] < 0) {
+				ctx->exit_status = 1;
+				perror("minishell: fork");
+				return (-1);
+			}
 		}
-		i++;
-		node = node->next;
-	}
-	return (0);
+		return (0);
 }
 
 // Wait for all children, store only last exit status.

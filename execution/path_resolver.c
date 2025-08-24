@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 18:16:00 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/23 18:16:13 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/24 18:10:42 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,10 +16,18 @@
 // Return cmd itself if it contains '/' and is executable.
 static char	*get_abs_path(char *cmd)
 {
+	struct stat st;
 	if (ft_strchr(cmd, '/'))
-		if (access(cmd, X_OK) == 0)
-			return (ft_strdup(cmd));
-	return (NULL);
+	{
+		if (stat(cmd, &st) == 0)
+		{
+			if (S_ISDIR(st.st_mode))
+				return NULL;
+			if (access(cmd, X_OK) == 0)
+				return ft_strdup(cmd);
+		}
+	}
+	return NULL;
 }
 
 // Search for cmd in each directory of paths[]. Return first match.

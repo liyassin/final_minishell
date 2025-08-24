@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/28 17:27:55 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/23 21:47:54 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/23 18:11:49 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,12 +91,4 @@ void	free_ast(t_ast *ast)
 		free(current);
 		current = next;
 	}
-}
-void cleanup_shell(t_ast *ast, t_context *ctx)
-{
-    if (ast)
-        free_ast(ast);
-    if (ctx && ctx->env)
-        free_environment(ctx->env);
-    clear_history();
 }

@@ -6,13 +6,32 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 18:14:09 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/23 21:51:59 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/24 21:47:19 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 #include "../includes/tokenization.h"
 #include "../includes/env_utils.h"
+
+// Extracts the first word after trimming leading spaces/tabs
+static char *extract_first_command_word(char *str)
+{
+	char    *trimmed;
+	char    *first_word;
+	size_t  j = 0;
+	size_t  len;
+
+	trimmed = ft_strtrim(str, " \t");
+	if (!trimmed)
+		return (NULL);
+	while (trimmed[j] && !ft_isspace(trimmed[j]))
+		j++;
+	len = j;
+	first_word = ft_substr(trimmed, 0, len);
+	free(trimmed);
+	return (first_word);
+}
 
 t_ast	*alloc_ast(char **tokens)
 {
@@ -98,7 +117,11 @@ int	fill_args(t_ast *ast, char **tokens, t_context *ctx)
 			if (!ast->args[arg_i])
 				return (0);
 			if (arg_i == 0)
-				ast->command = ft_strdup(ast->args[0]);
+			{
+				ast->command = extract_first_command_word(ast->args[0]);
+				if (!ast->command)
+					return (0);
+			}
 			arg_i++;
 			i++;
 		}
@@ -127,6 +150,6 @@ t_ast	*tokenize_input(const char *input, t_context *ctx)
 		ok = 1;
 	free_split(tokens);
 	if (!ok || (!ast->command && !ast->redirs))
-		return (cleanup_shell(ast, ctx), (t_ast *) NULL);
+		return (free_ast(ast), (t_ast *) NULL);
 	return (ast);
 }
