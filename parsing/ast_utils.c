@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 18:14:09 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/24 21:47:19 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/25 00:07:30 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,8 +94,10 @@ void	fill_redirections(t_ast *ast, char **tokens, t_context *ctx)
 
 int	fill_args(t_ast *ast, char **tokens, t_context *ctx)
 {
-	int	i;
-	int	arg_i;
+	int		i;
+	int		arg_i;
+	int		quoted;
+	char	*tok;
 
 	i = 0;
 	arg_i = 0;
@@ -113,12 +115,21 @@ int	fill_args(t_ast *ast, char **tokens, t_context *ctx)
 			i++;
 		else
 		{
-			ast->args[arg_i] = handle_quotes(tokens[i], ctx);
+			quoted = 0;
+			tok = tokens[i];
+			if ((tok[0] == '"' && tok[ft_strlen(tok) - 1] == '"'))
+				quoted = 1;
+			else if ((tok[0] == '\'' && tok[ft_strlen(tok) - 1] == '\''))
+				quoted = 1;
+			ast->args[arg_i] = handle_quotes(tok, ctx);
 			if (!ast->args[arg_i])
 				return (0);
 			if (arg_i == 0)
 			{
-				ast->command = extract_first_command_word(ast->args[0]);
+				if (quoted)
+					ast->command = ft_strdup(tok);
+				else
+					ast->command = extract_first_command_word(ast->args[0]);
 				if (!ast->command)
 					return (0);
 			}

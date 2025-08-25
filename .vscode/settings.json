@@ -9,6 +9,8 @@
         "builtins.h": "c",
         "minishell.h": "c",
         "token": "c",
-        "env_utils.h": "c"
+        "env_utils.h": "c",
+        "signals.h": "c",
+        "unistd.h": "c"
     }
 }

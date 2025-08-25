@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 18:16:18 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/23 19:23:24 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/25 03:23:27 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,12 +35,6 @@ int	main(int argc, char **argv, char **envp)
 		if (!head)
 			continue ;
 		process_heredocs(head, &ctx);
-		if (g_signal)
-		{
-			ctx.exit_status = 130;
-			free_ast(head);
-			continue ;
-		}
 		execute_if_needed(head, &ctx, &should_exit);
 		free_ast(head);
 	}

@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 18:13:13 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/23 18:13:32 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/25 02:08:10 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,6 @@ char	*read_input(int *should_exit, t_context *ctx)
 	char	*input;
 	char	*trimmed;
 
-	g_signal = 0;
 	input = readline("$ [minishell] > ");
 	if (!input)
 	{

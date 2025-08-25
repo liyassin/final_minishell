@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 18:12:53 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/23 18:12:57 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/25 03:23:38 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,14 +61,30 @@ t_redir	*create_redir_node(t_redir_type type, char *raw_target,
 	stripped = remove_all_quotes(raw_target);
 	if (!stripped)
 		return (free(new), (t_redir *) NULL);
-	if (raw_target[0] != '\'')
-	{
-		expanded = expand_env_vars(stripped, ctx->env, ctx->exit_status);
-		free(stripped);
-		new->target = expanded;
-	}
-	else
-		new->target = stripped;
+	   if (type == REDIR_HEREDOC)
+	   {
+		   // Only expand heredoc delimiter if double-quoted
+		   if (raw_target[0] == '"' && raw_target[ft_strlen(raw_target) - 1] == '"')
+		   {
+			   expanded = expand_env_vars(stripped, ctx->env, ctx->exit_status);
+			   free(stripped);
+			   new->target = expanded;
+		   }
+		   else
+			   new->target = stripped;
+	   }
+	   else
+	   {
+		   // For other redirections, expand unless single-quoted
+		   if (raw_target[0] != '\'')
+		   {
+			   expanded = expand_env_vars(stripped, ctx->env, ctx->exit_status);
+			   free(stripped);
+			   new->target = expanded;
+		   }
+		   else
+			   new->target = stripped;
+	   }
 	if (type == REDIR_HEREDOC)
 	{
 		new->quoted = quoted;

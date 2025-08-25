@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 18:15:30 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/24 18:00:28 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/24 23:31:08 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ static void	exec_node(t_ast *node, t_context *ctx)
 	char		*path;
 
 	if (handle_redirection(node) < 0)
-		exit(EXIT_FAILURE);
+		exit(1);
 	if (!node->command || !*node->command)
 		exit(0);
 	type = get_builtin_type(node->args[0]);
@@ -35,34 +35,47 @@ static void	exec_node(t_ast *node, t_context *ctx)
 	exit(126);
 }
 
-// Fork each stage: child sets up pipes and exec_node(), parent records pid.
 static int	fork_children(t_ast *ast, t_context *ctx,
 	int n, int pipes[][2], pid_t *pids)
 {
+	int		idx;
+	t_ast	*cur;
+	t_ast	**nodes;
+	int		i;
 
-		// Collect nodes in array for right-to-left forking
-		t_ast *nodes[n];
-		t_ast *cur = ast;
-		int idx = 0;
-		while (cur && idx < n) {
-			nodes[idx++] = cur;
-			cur = cur->next;
+	nodes = (t_ast **)malloc(sizeof(t_ast *) * n);
+	if (!nodes)
+		return (-1);
+	cur = ast;
+	idx = 0;
+	while (cur && idx < n)
+	{
+		nodes[idx] = cur;
+		idx++;
+		cur = cur->next;
+	}
+	i = n - 1;
+	while (i >= 0)
+	{
+		pids[i] = fork();
+		if (pids[i] == 0)
+		{
+			reset_default_signals();
+			setup_pipes(i, n, pipes);
+			close_pipes(n, pipes);
+			exec_node(nodes[i], ctx);
 		}
-
-		for (int i = n - 1; i >= 0; i--) {
-			pids[i] = fork();
-			if (pids[i] == 0) {
-				reset_default_signals();
-				setup_pipes(i, n, pipes);
-				close_pipes(n, pipes);
-				exec_node(nodes[i], ctx);
-			} else if (pids[i] < 0) {
-				ctx->exit_status = 1;
-				perror("minishell: fork");
-				return (-1);
-			}
+		else if (pids[i] < 0)
+		{
+			ctx->exit_status = 1;
+			perror("minishell: fork");
+			free(nodes);
+			return (-1);
 		}
-		return (0);
+		i--;
+	}
+	free(nodes);
+	return (0);
 }
 
 // Wait for all children, store only last exit status.

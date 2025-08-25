@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 18:17:02 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/24 18:05:08 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/25 00:07:30 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ static void child_exec(t_ast *ast, t_context *ctx)
 
 	reset_default_signals();
 	if (handle_redirection(ast) < 0)
-		exit(EXIT_FAILURE);
+		exit(1);
 	type = get_builtin_type(ast->args[0]);
 	if (type != NOT_BUILTIN)
 	{
