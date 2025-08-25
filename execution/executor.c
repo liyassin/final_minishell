@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 18:16:45 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/25 03:23:33 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/25 04:14:34 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,8 @@
 void	execute_if_needed(t_ast *head, t_context *ctx, int *should_exit)
 {
 	t_builtin	type;
-	int			ret;
+	int		ret;
+
 
 	if (!head)
 		return ;
@@ -36,11 +37,6 @@ void	execute_if_needed(t_ast *head, t_context *ctx, int *should_exit)
 				ft_putstr_fd(r->target, STDERR_FILENO);
 				ft_putstr_fd(": Is a directory\n", STDERR_FILENO);
 			}
-			// else
-			// {
-			// 	ft_putstr_fd("minishell: syntax error near unexpected token `redirection'\n",
-			// 		STDERR_FILENO);
-			// }
 			ctx->exit_status = 1;
 		}
 		else

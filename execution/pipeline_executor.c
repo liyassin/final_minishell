@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 18:15:30 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/24 23:31:08 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/25 04:48:40 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,6 +114,8 @@ void	execute_pipeline(t_ast *ast, t_context *ctx)
 	n = count_pipeline(ast);
 	if (n <= 0)
 		return ;
+	// Print debug after confirming pipeline will run
+	// ...existing code...
 	if (open_pipes(n, &pipes) < 0)
 		return ;
 	pids = alloc_pids(n);

@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 18:14:39 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/25 00:07:30 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/25 04:14:39 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,8 +88,7 @@ int	handle_redirection(t_ast *ast)
 		else if (r->type == REDIR_HEREDOC)
 		{
 			if (r->heredoc_fd[0] == -1)
-				return (ft_putstr_fd("minishell: heredoc not initialized\n",
-						STDERR_FILENO), -1);
+				return (-1);
 			if (dup2(r->heredoc_fd[0], STDIN_FILENO) < 0)
 				return (perror("minishell"), -1);
 			close(r->heredoc_fd[0]);

@@ -6,28 +6,28 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 18:13:43 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/25 03:23:56 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/25 04:40:45 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 #include "../includes/signals.h"
+#include <readline/readline.h>
 
-/*
-** Handles SIGINT in heredoc child process.
-** Prints a newline and exits with status 1.
-*/
+extern volatile sig_atomic_t g_signal;
+
 static void	heredoc_sigint_handler(int sig)
 {
-	(void)sig;
+	g_signal = sig;
 	write(2, "\n", 1);
 	exit(1);
 }
 
-/*
-** Writes a line to the heredoc file descriptor.
-** Expands environment variables if not quoted.
-*/
+static void	parent_sigint_handler(int sig)
+{
+	g_signal = sig;
+}
+
 static void	write_heredoc_line(t_redir *r, char *line, t_context *ctx)
 {
 	char	*expanded;
@@ -46,10 +46,6 @@ static void	write_heredoc_line(t_redir *r, char *line, t_context *ctx)
 	}
 }
 
-/*
-** Child process for heredoc input.
-** Sets SIGINT handler and reads lines until delimiter is found.
-*/
 static void	heredoc_child_process(t_redir *r, t_context *ctx)
 {
 	struct sigaction	sa;
@@ -62,7 +58,7 @@ static void	heredoc_child_process(t_redir *r, t_context *ctx)
 	while (1)
 	{
 		line = readline("> ");
-		if (!line)
+		if (!line || g_signal == SIGINT)
 			exit(0);
 		if (ft_strcmp(line, r->target) == 0)
 		{
@@ -76,24 +72,64 @@ static void	heredoc_child_process(t_redir *r, t_context *ctx)
 	exit(0);
 }
 
-/*
-** Forks a child to read heredoc input.
-** Parent ignores SIGINT and sets exit status on interruption.
-*/
+static void	close_remaining_heredocs(t_ast *head)
+{
+	t_ast	*node;
+	t_redir	*r;
+
+	node = head;
+	while (node)
+	{
+		r = node->redirs;
+		while (r)
+		{
+			if (r->type == REDIR_HEREDOC)
+			{
+				if (r->heredoc_fd[0] != -1)
+				{
+					close(r->heredoc_fd[0]);
+					r->heredoc_fd[0] = -1;
+				}
+				if (r->heredoc_fd[1] != -1)
+				{
+					close(r->heredoc_fd[1]);
+					r->heredoc_fd[1] = -1;
+				}
+			}
+			r = r->next;
+		}
+		node = node->next;
+	}
+}
+
 void	read_heredoc(t_redir *r, t_context *ctx)
 {
 	pid_t	pid;
 	int		status;
 
+	if (pipe(r->heredoc_fd) == -1)
+	{
+		perror("pipe");
+		ctx->exit_status = 1;
+		return ;
+	}
 	pid = fork();
 	if (pid == 0)
 		heredoc_child_process(r, ctx);
 	else if (pid > 0)
 	{
-		signal(SIGINT, SIG_IGN);
+		signal(SIGINT, parent_sigint_handler);
 		waitpid(pid, &status, 0);
-		setup_shell_signals();
 		if (WIFSIGNALED(status) && WTERMSIG(status) == SIGINT)
+		{
+			close(r->heredoc_fd[1]);
+			close(r->heredoc_fd[0]);
+			r->heredoc_fd[0] = -1;
+			r->heredoc_fd[1] = -1;
+			ctx->exit_status = 130;
+			g_signal = SIGINT;
+		}
+		else if (g_signal == SIGINT)
 		{
 			close(r->heredoc_fd[1]);
 			close(r->heredoc_fd[0]);
@@ -110,33 +146,37 @@ void	read_heredoc(t_redir *r, t_context *ctx)
 	else
 	{
 		perror("fork");
+		close(r->heredoc_fd[0]);
+		close(r->heredoc_fd[1]);
 		ctx->exit_status = 1;
 	}
 }
 
-/*
-** Processes all heredoc redirections in the AST.
-** Stops on SIGINT interruption.
-*/
 void	process_heredocs(t_ast *head, t_context *ctx)
 {
 	t_ast	*node;
 	t_redir	*r;
 
+	g_signal = 0;
 	node = head;
-	while (node)
+	while (node && g_signal != SIGINT)
 	{
 		r = node->redirs;
-		while (r)
+		while (r && g_signal != SIGINT)
 		{
 			if (r->type == REDIR_HEREDOC)
 			{
 				read_heredoc(r, ctx);
-				if (ctx->exit_status == 130)
+				if (ctx->exit_status == 130 || g_signal == SIGINT)
+				{
+					close_remaining_heredocs(head);
+					setup_shell_signals();
 					return ;
+				}
 			}
 			r = r->next;
 		}
 		node = node->next;
 	}
+	setup_shell_signals();
 }
