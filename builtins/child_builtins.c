@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 18:23:05 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/25 06:04:28 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/26 07:57:03 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,8 @@
 // env builtin: print all VAR=VALUE entries.
 int	builtin_env(t_context *ctx)
 {
-	int	i;
+	int i;
+	char *eq;
 
 	if (!ctx->env)
 	{
@@ -25,12 +26,13 @@ int	builtin_env(t_context *ctx)
 		return (1);
 	}
 	i = 0;
-	while (ctx->env[i])
-	{
-		if (ft_strchr(ctx->env[i], '='))
-			ft_putendl_fd(ctx->env[i], STDOUT_FILENO);
-		i++;
-	}
+	   while (ctx->env[i])
+	   {
+			   eq = ft_strchr(ctx->env[i], '=');
+			   if (eq)
+					   ft_putendl_fd(ctx->env[i], STDOUT_FILENO);
+			   i++;
+	   }
 	ctx->exit_status = 0;
 	return (0);
 }

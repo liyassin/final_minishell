@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 16:38:10 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/23 18:20:37 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/26 07:57:03 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,22 +14,22 @@
 #include "../includes/minishell.h"
 
 // Print all exported vars in the form:
-// declare -x NAME="value"
-static void	print_all_exports(char **env)
+// declare -x NAME or declare -x NAME="value"
+static void print_all_exports(char **exported)
 {
-	int		i;
-	char	*eq;
-	size_t	name_len;
-	char	*name;
+	int i;
+	char *eq;
+	size_t name_len;
+	char *name;
 
 	i = 0;
-	while (env[i])
+	while (exported && exported[i])
 	{
-		eq = ft_strchr(env[i], '=');
+		eq = ft_strchr(exported[i], '=');
 		if (eq)
 		{
-			name_len = eq - env[i];
-			name = ft_strndup(env[i], name_len);
+			name_len = eq - exported[i];
+			name = ft_strndup(exported[i], name_len);
 			if (name)
 			{
 				ft_putstr_fd("declare -x ", STDOUT_FILENO);
@@ -40,17 +40,64 @@ static void	print_all_exports(char **env)
 				free(name);
 			}
 		}
+		else
+		{
+			ft_putstr_fd("declare -x ", STDOUT_FILENO);
+			ft_putstr_fd(exported[i], STDOUT_FILENO);
+			ft_putstr_fd("\n", STDOUT_FILENO);
+		}
 		i++;
 	}
 }
 
 // Process one export argument "NAME[=VALUE]".
 // Returns 0 on success, 1 on invalid identifier.
-static int	process_export_arg(char *arg, t_context *ctx)
+// Add or update exported variable in ctx->exported
+static void add_exported(char ***exported, const char *arg)
 {
-	char	*eq;
-	size_t	name_len;
-	char	*name;
+	int i = 0;
+	char *eq;
+	size_t name_len;
+	char *name;
+
+	eq = ft_strchr(arg, '=');
+	if (eq)
+		name_len = eq - arg;
+	else
+		name_len = ft_strlen(arg);
+	name = ft_strndup(arg, name_len);
+	// Check if already exported
+	if (*exported)
+	{
+		while ((*exported)[i])
+		{
+			if (!ft_strncmp((*exported)[i], name, name_len) && ((*exported)[i][name_len] == '=' || (*exported)[i][name_len] == '\0'))
+			{
+				free((*exported)[i]);
+				(*exported)[i] = ft_strdup(arg);
+				free(name);
+				return;
+			}
+			i++;
+		}
+	}
+	// Add new exported variable
+	int count = i;
+	char **new_list = malloc(sizeof(char *) * (count + 2));
+	for (i = 0; i < count; i++)
+		new_list[i] = (*exported)[i];
+	new_list[count] = ft_strdup(arg);
+	new_list[count + 1] = NULL;
+	free(*exported);
+	*exported = new_list;
+	free(name);
+}
+
+static int process_export_arg(char *arg, t_context *ctx)
+{
+	char *eq;
+	size_t name_len;
+	char *name;
 
 	eq = ft_strchr(arg, '=');
 	if (eq)
@@ -66,24 +113,27 @@ static int	process_export_arg(char *arg, t_context *ctx)
 		free(name);
 		return (1);
 	}
+	// Always add to exported list, even if no '='
+	if (eq)
+		add_exported(&ctx->exported, arg);
+	else
+		add_exported(&ctx->exported, name);
 	if (eq)
 		update_env(&ctx->env, name, eq + 1);
-	else
-		update_env(&ctx->env, name, "");
 	free(name);
 	return (0);
 }
 
 // export builtin: with no args, print all;
 // otherwise process each NAME[=VALUE].
-int	builtin_export(char **args, t_context *ctx)
+int builtin_export(char **args, t_context *ctx)
 {
-	int	i;
-	int	status;
+	int i;
+	int status;
 
 	if (!args[1])
 	{
-		print_all_exports(ctx->env);
+		print_all_exports(ctx->exported);
 		ctx->exit_status = 0;
 		return (0);
 	}

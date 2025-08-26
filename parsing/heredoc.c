@@ -6,13 +6,12 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 18:13:43 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/26 05:23:03 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/26 06:55:40 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 #include "../includes/signals.h"
-#include <readline/readline.h>
 
 extern volatile sig_atomic_t g_signal;
 

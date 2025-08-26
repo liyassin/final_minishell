@@ -1,0 +1,1033 @@
+==206449== Memcheck, a memory error detector
+==206449== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==206449== Using Valgrind-3.18.1 and LibVEX; rerun with -h for copyright info
+==206449== Command: ./minishell
+==206449== 
+[?2004h$ [minishell] > echo | l[Ks
+[?2004lminishell: s: command not found
+==206453== 
+==206453== HEAP SUMMARY:
+==206453==     in use at exit: 212,861 bytes in 302 blocks
+==206453==   total heap usage: 527 allocs, 225 frees, 236,818 bytes allocated
+==206453== 
+==206453== 7 bytes in 2 blocks are still reachable in loss record 1 of 75
+==206453==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==206453==    by 0x407438: ft_calloc (in /home/anassih/Desktop/Projects/final_minishell/minishell)
+==206453==    by 0x406920: expand_env_vars (env_expand_build.c:87)
+==206453==    by 0x402281: handle_quotes (quotes.c:76)
+==206453==    by 0x401E7C: fill_args (ast_utils.c:124)
+==206453==    by 0x4020DF: tokenize_input (ast_utils.c:161)
+==206453==    by 0x40138E: build_pipeline_list (ast_builder.c:28)
+==206453==    by 0x40131A: build_ast_pipeline (ast_builder.c:59)
+==206453==    by 0x404418: main (main.c:35)
+==206453== 
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:ft_calloc
+   fun:expand_env_vars
+   fun:handle_quotes
+   fun:fill_args
+   fun:tokenize_input
+   fun:build_pipeline_list
+   fun:build_ast_pipeline
+   fun:main
+}
+==206453== 7 bytes in 2 blocks are still reachable in loss record 2 of 75
+==206453==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==206453==    by 0x407438: ft_calloc (in /home/anassih/Desktop/Projects/final_minishell/minishell)
+==206453==    by 0x408403: ft_substr (in /home/anassih/Desktop/Projects/final_minishell/minishell)
+==206453==    by 0x402025: extract_first_command_word (ast_utils.c:31)
+==206453==    by 0x401EEE: fill_args (ast_utils.c:132)
+==206453==    by 0x4020DF: tokenize_input (ast_utils.c:161)
+==206453==    by 0x40138E: build_pipeline_list (ast_builder.c:28)
+==206453==    by 0x40131A: build_ast_pipeline (ast_builder.c:59)
+==206453==    by 0x404418: main (main.c:35)
+==206453== 
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:ft_calloc
+   fun:ft_substr
+   fun:extract_first_command_word
+   fun:fill_args
+   fun:tokenize_input
+   fun:build_pipeline_list
+   fun:build_ast_pipeline
+   fun:main
+}
+==206453== 8 bytes in 1 blocks are still reachable in loss record 5 of 75
+==206453==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==206453==    by 0x407438: ft_calloc (in /home/anassih/Desktop/Projects/final_minishell/minishell)
+==206453==    by 0x404761: open_pipes (pipeline_setup.c:38)
+==206453==    by 0x404971: execute_pipeline (pipeline_executor.c:123)
+==206453==    by 0x404363: execute_if_needed (executor.c:56)
+==206453==    by 0x404469: main (main.c:46)
+==206453== 
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:ft_calloc
+   fun:open_pipes
+   fun:execute_pipeline
+   fun:execute_if_needed
+   fun:main
+}
+==206453== 8 bytes in 1 blocks are still reachable in loss record 6 of 75
+==206453==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==206453==    by 0x407438: ft_calloc (in /home/anassih/Desktop/Projects/final_minishell/minishell)
+==206453==    by 0x404828: alloc_pids (pipeline_setup.c:57)
+==206453==    by 0x404987: execute_pipeline (pipeline_executor.c:125)
+==206453==    by 0x404363: execute_if_needed (executor.c:56)
+==206453==    by 0x404469: main (main.c:46)
+==206453== 
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:ft_calloc
+   fun:alloc_pids
+   fun:execute_pipeline
+   fun:execute_if_needed
+   fun:main
+}
+==206453== 16 bytes in 1 blocks are still reachable in loss record 14 of 75
+==206453==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==206453==    by 0x404A47: fork_children (pipeline_executor.c:46)
+==206453==    by 0x4049BC: execute_pipeline (pipeline_executor.c:131)
+==206453==    by 0x404363: execute_if_needed (executor.c:56)
+==206453==    by 0x404469: main (main.c:46)
+==206453== 
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:fork_children
+   fun:execute_pipeline
+   fun:execute_if_needed
+   fun:main
+}
+==206453== 32 bytes in 2 blocks are still reachable in loss record 21 of 75
+==206453==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==206453==    by 0x407438: ft_calloc (in /home/anassih/Desktop/Projects/final_minishell/minishell)
+==206453==    by 0x401951: alloc_ast (ast_utils.c:47)
+==206453==    by 0x402098: tokenize_input (ast_utils.c:157)
+==206453==    by 0x40138E: build_pipeline_list (ast_builder.c:28)
+==206453==    by 0x40131A: build_ast_pipeline (ast_builder.c:59)
+==206453==    by 0x404418: main (main.c:35)
+==206453== 
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:ft_calloc
+   fun:alloc_ast
+   fun:tokenize_input
+   fun:build_pipeline_list
+   fun:build_ast_pipeline
+   fun:main
+}
+==206453== 64 bytes in 2 blocks are still reachable in loss record 25 of 75
+==206453==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==206453==    by 0x407438: ft_calloc (in /home/anassih/Desktop/Projects/final_minishell/minishell)
+==206453==    by 0x401922: alloc_ast (ast_utils.c:44)
+==206453==    by 0x402098: tokenize_input (ast_utils.c:157)
+==206453==    by 0x40138E: build_pipeline_list (ast_builder.c:28)
+==206453==    by 0x40131A: build_ast_pipeline (ast_builder.c:59)
+==206453==    by 0x404418: main (main.c:35)
+==206453== 
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:ft_calloc
+   fun:alloc_ast
+   fun:tokenize_input
+   fun:build_pipeline_list
+   fun:build_ast_pipeline
+   fun:main
+}
+==206453== 528 bytes in 1 blocks are still reachable in loss record 33 of 75
+==206453==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==206453==    by 0x407438: ft_calloc (in /home/anassih/Desktop/Projects/final_minishell/minishell)
+==206453==    by 0x4062CE: copy_environment (env_array.c:26)
+==206453==    by 0x4043B2: main (main.c:25)
+==206453== 
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:ft_calloc
+   fun:copy_environment
+   fun:main
+}
+==206453== 3,958 bytes in 65 blocks are still reachable in loss record 52 of 75
+==206453==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==206453==    by 0x407CE9: ft_strdup (in /home/anassih/Desktop/Projects/final_minishell/minishell)
+==206453==    by 0x40630E: copy_environment (env_array.c:32)
+==206453==    by 0x4043B2: main (main.c:25)
+==206453== 
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:ft_strdup
+   fun:copy_environment
+   fun:main
+}
+==206453== LEAK SUMMARY:
+==206453==    definitely lost: 0 bytes in 0 blocks
+==206453==    indirectly lost: 0 bytes in 0 blocks
+==206453==      possibly lost: 0 bytes in 0 blocks
+==206453==    still reachable: 4,628 bytes in 77 blocks
+==206453==         suppressed: 208,233 bytes in 225 blocks
+==206453== 
+==206453== For lists of detected and suppressed errors, rerun with: -s
+==206453== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+==206452== 
+==206452== HEAP SUMMARY:
+==206452==     in use at exit: 212,859 bytes in 301 blocks
+==206452==   total heap usage: 567 allocs, 266 frees, 237,536 bytes allocated
+==206452== 
+==206452== 5 bytes in 1 blocks are still reachable in loss record 1 of 75
+==206452==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==206452==    by 0x407438: ft_calloc (in /home/anassih/Desktop/Projects/final_minishell/minishell)
+==206452==    by 0x408403: ft_substr (in /home/anassih/Desktop/Projects/final_minishell/minishell)
+==206452==    by 0x402025: extract_first_command_word (ast_utils.c:31)
+==206452==    by 0x401EEE: fill_args (ast_utils.c:132)
+==206452==    by 0x4020DF: tokenize_input (ast_utils.c:161)
+==206452==    by 0x40138E: build_pipeline_list (ast_builder.c:28)
+==206452==    by 0x40131A: build_ast_pipeline (ast_builder.c:59)
+==206452==    by 0x404418: main (main.c:35)
+==206452== 
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:ft_calloc
+   fun:ft_substr
+   fun:extract_first_command_word
+   fun:fill_args
+   fun:tokenize_input
+   fun:build_pipeline_list
+   fun:build_ast_pipeline
+   fun:main
+}
+==206452== 7 bytes in 2 blocks are still reachable in loss record 2 of 75
+==206452==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==206452==    by 0x407438: ft_calloc (in /home/anassih/Desktop/Projects/final_minishell/minishell)
+==206452==    by 0x406920: expand_env_vars (env_expand_build.c:87)
+==206452==    by 0x402281: handle_quotes (quotes.c:76)
+==206452==    by 0x401E7C: fill_args (ast_utils.c:124)
+==206452==    by 0x4020DF: tokenize_input (ast_utils.c:161)
+==206452==    by 0x40138E: build_pipeline_list (ast_builder.c:28)
+==206452==    by 0x40131A: build_ast_pipeline (ast_builder.c:59)
+==206452==    by 0x404418: main (main.c:35)
+==206452== 
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:ft_calloc
+   fun:expand_env_vars
+   fun:handle_quotes
+   fun:fill_args
+   fun:tokenize_input
+   fun:build_pipeline_list
+   fun:build_ast_pipeline
+   fun:main
+}
+==206452== 8 bytes in 1 blocks are still reachable in loss record 5 of 75
+==206452==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==206452==    by 0x407438: ft_calloc (in /home/anassih/Desktop/Projects/final_minishell/minishell)
+==206452==    by 0x404761: open_pipes (pipeline_setup.c:38)
+==206452==    by 0x404971: execute_pipeline (pipeline_executor.c:123)
+==206452==    by 0x404363: execute_if_needed (executor.c:56)
+==206452==    by 0x404469: main (main.c:46)
+==206452== 
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:ft_calloc
+   fun:open_pipes
+   fun:execute_pipeline
+   fun:execute_if_needed
+   fun:main
+}
+==206452== 8 bytes in 1 blocks are still reachable in loss record 6 of 75
+==206452==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==206452==    by 0x407438: ft_calloc (in /home/anassih/Desktop/Projects/final_minishell/minishell)
+==206452==    by 0x404828: alloc_pids (pipeline_setup.c:57)
+==206452==    by 0x404987: execute_pipeline (pipeline_executor.c:125)
+==206452==    by 0x404363: execute_if_needed (executor.c:56)
+==206452==    by 0x404469: main (main.c:46)
+==206452== 
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:ft_calloc
+   fun:alloc_pids
+   fun:execute_pipeline
+   fun:execute_if_needed
+   fun:main
+}
+==206452== 16 bytes in 1 blocks are still reachable in loss record 14 of 75
+==206452==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==206452==    by 0x404A47: fork_children (pipeline_executor.c:46)
+==206452==    by 0x4049BC: execute_pipeline (pipeline_executor.c:131)
+==206452==    by 0x404363: execute_if_needed (executor.c:56)
+==206452==    by 0x404469: main (main.c:46)
+==206452== 
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:fork_children
+   fun:execute_pipeline
+   fun:execute_if_needed
+   fun:main
+}
+==206452== 32 bytes in 2 blocks are still reachable in loss record 21 of 75
+==206452==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==206452==    by 0x407438: ft_calloc (in /home/anassih/Desktop/Projects/final_minishell/minishell)
+==206452==    by 0x401951: alloc_ast (ast_utils.c:47)
+==206452==    by 0x402098: tokenize_input (ast_utils.c:157)
+==206452==    by 0x40138E: build_pipeline_list (ast_builder.c:28)
+==206452==    by 0x40131A: build_ast_pipeline (ast_builder.c:59)
+==206452==    by 0x404418: main (main.c:35)
+==206452== 
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:ft_calloc
+   fun:alloc_ast
+   fun:tokenize_input
+   fun:build_pipeline_list
+   fun:build_ast_pipeline
+   fun:main
+}
+==206452== 64 bytes in 2 blocks are still reachable in loss record 25 of 75
+==206452==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==206452==    by 0x407438: ft_calloc (in /home/anassih/Desktop/Projects/final_minishell/minishell)
+==206452==    by 0x401922: alloc_ast (ast_utils.c:44)
+==206452==    by 0x402098: tokenize_input (ast_utils.c:157)
+==206452==    by 0x40138E: build_pipeline_list (ast_builder.c:28)
+==206452==    by 0x40131A: build_ast_pipeline (ast_builder.c:59)
+==206452==    by 0x404418: main (main.c:35)
+==206452== 
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:ft_calloc
+   fun:alloc_ast
+   fun:tokenize_input
+   fun:build_pipeline_list
+   fun:build_ast_pipeline
+   fun:main
+}
+==206452== 528 bytes in 1 blocks are still reachable in loss record 33 of 75
+==206452==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==206452==    by 0x407438: ft_calloc (in /home/anassih/Desktop/Projects/final_minishell/minishell)
+==206452==    by 0x4062CE: copy_environment (env_array.c:26)
+==206452==    by 0x4043B2: main (main.c:25)
+==206452== 
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:ft_calloc
+   fun:copy_environment
+   fun:main
+}
+==206452== 3,958 bytes in 65 blocks are still reachable in loss record 52 of 75
+==206452==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==206452==    by 0x407CE9: ft_strdup (in /home/anassih/Desktop/Projects/final_minishell/minishell)
+==206452==    by 0x40630E: copy_environment (env_array.c:32)
+==206452==    by 0x4043B2: main (main.c:25)
+==206452== 
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:ft_strdup
+   fun:copy_environment
+   fun:main
+}
+==206452== LEAK SUMMARY:
+==206452==    definitely lost: 0 bytes in 0 blocks
+==206452==    indirectly lost: 0 bytes in 0 blocks
+==206452==      possibly lost: 0 bytes in 0 blocks
+==206452==    still reachable: 4,626 bytes in 76 blocks
+==206452==         suppressed: 208,233 bytes in 225 blocks
+==206452== 
+==206452== For lists of detected and suppressed errors, rerun with: -s
+==206452== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+[?2004h$ [minishell] > echo | ls
+[?2004lbuiltins
+cleanup.c
+env_utils
+execution
+file
+file2
+includes
+libft
+main.c
+Makefile
+minishell
+minishell_tester
+obj
+parsing
+readline.supp
+signals.c
+valgrind.log
+==206456== 
+==206456== HEAP SUMMARY:
+==206456==     in use at exit: 212,909 bytes in 305 blocks
+==206456==   total heap usage: 560 allocs, 255 frees, 237,486 bytes allocated
+==206456== 
+==206456== 8 bytes in 1 blocks are still reachable in loss record 2 of 75
+==206456==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==206456==    by 0x407438: ft_calloc (in /home/anassih/Desktop/Projects/final_minishell/minishell)
+==206456==    by 0x404761: open_pipes (pipeline_setup.c:38)
+==206456==    by 0x404971: execute_pipeline (pipeline_executor.c:123)
+==206456==    by 0x404363: execute_if_needed (executor.c:56)
+==206456==    by 0x404469: main (main.c:46)
+==206456== 
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:ft_calloc
+   fun:open_pipes
+   fun:execute_pipeline
+   fun:execute_if_needed
+   fun:main
+}
+==206456== 8 bytes in 1 blocks are still reachable in loss record 3 of 75
+==206456==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==206456==    by 0x407438: ft_calloc (in /home/anassih/Desktop/Projects/final_minishell/minishell)
+==206456==    by 0x404828: alloc_pids (pipeline_setup.c:57)
+==206456==    by 0x404987: execute_pipeline (pipeline_executor.c:125)
+==206456==    by 0x404363: execute_if_needed (executor.c:56)
+==206456==    by 0x404469: main (main.c:46)
+==206456== 
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:ft_calloc
+   fun:alloc_pids
+   fun:execute_pipeline
+   fun:execute_if_needed
+   fun:main
+}
+==206456== 8 bytes in 2 blocks are still reachable in loss record 5 of 75
+==206456==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==206456==    by 0x407438: ft_calloc (in /home/anassih/Desktop/Projects/final_minishell/minishell)
+==206456==    by 0x406920: expand_env_vars (env_expand_build.c:87)
+==206456==    by 0x402281: handle_quotes (quotes.c:76)
+==206456==    by 0x401E7C: fill_args (ast_utils.c:124)
+==206456==    by 0x4020DF: tokenize_input (ast_utils.c:161)
+==206456==    by 0x40138E: build_pipeline_list (ast_builder.c:28)
+==206456==    by 0x40131A: build_ast_pipeline (ast_builder.c:59)
+==206456==    by 0x404418: main (main.c:35)
+==206456== 
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:ft_calloc
+   fun:expand_env_vars
+   fun:handle_quotes
+   fun:fill_args
+   fun:tokenize_input
+   fun:build_pipeline_list
+   fun:build_ast_pipeline
+   fun:main
+}
+==206456== 8 bytes in 2 blocks are still reachable in loss record 6 of 75
+==206456==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==206456==    by 0x407438: ft_calloc (in /home/anassih/Desktop/Projects/final_minishell/minishell)
+==206456==    by 0x408403: ft_substr (in /home/anassih/Desktop/Projects/final_minishell/minishell)
+==206456==    by 0x402025: extract_first_command_word (ast_utils.c:31)
+==206456==    by 0x401EEE: fill_args (ast_utils.c:132)
+==206456==    by 0x4020DF: tokenize_input (ast_utils.c:161)
+==206456==    by 0x40138E: build_pipeline_list (ast_builder.c:28)
+==206456==    by 0x40131A: build_ast_pipeline (ast_builder.c:59)
+==206456==    by 0x404418: main (main.c:35)
+==206456== 
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:ft_calloc
+   fun:ft_substr
+   fun:extract_first_command_word
+   fun:fill_args
+   fun:tokenize_input
+   fun:build_pipeline_list
+   fun:build_ast_pipeline
+   fun:main
+}
+==206456== 16 bytes in 1 blocks are still reachable in loss record 12 of 75
+==206456==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==206456==    by 0x404A47: fork_children (pipeline_executor.c:46)
+==206456==    by 0x4049BC: execute_pipeline (pipeline_executor.c:131)
+==206456==    by 0x404363: execute_if_needed (executor.c:56)
+==206456==    by 0x404469: main (main.c:46)
+==206456== 
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:fork_children
+   fun:execute_pipeline
+   fun:execute_if_needed
+   fun:main
+}
+==206456== 32 bytes in 2 blocks are still reachable in loss record 20 of 75
+==206456==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==206456==    by 0x407438: ft_calloc (in /home/anassih/Desktop/Projects/final_minishell/minishell)
+==206456==    by 0x401951: alloc_ast (ast_utils.c:47)
+==206456==    by 0x402098: tokenize_input (ast_utils.c:157)
+==206456==    by 0x40138E: build_pipeline_list (ast_builder.c:28)
+==206456==    by 0x40131A: build_ast_pipeline (ast_builder.c:59)
+==206456==    by 0x404418: main (main.c:35)
+==206456== 
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:ft_calloc
+   fun:alloc_ast
+   fun:tokenize_input
+   fun:build_pipeline_list
+   fun:build_ast_pipeline
+   fun:main
+}
+==206456== 64 bytes in 2 blocks are still reachable in loss record 25 of 75
+==206456==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==206456==    by 0x407438: ft_calloc (in /home/anassih/Desktop/Projects/final_minishell/minishell)
+==206456==    by 0x401922: alloc_ast (ast_utils.c:44)
+==206456==    by 0x402098: tokenize_input (ast_utils.c:157)
+==206456==    by 0x40138E: build_pipeline_list (ast_builder.c:28)
+==206456==    by 0x40131A: build_ast_pipeline (ast_builder.c:59)
+==206456==    by 0x404418: main (main.c:35)
+==206456== 
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:ft_calloc
+   fun:alloc_ast
+   fun:tokenize_input
+   fun:build_pipeline_list
+   fun:build_ast_pipeline
+   fun:main
+}
+==206456== 528 bytes in 1 blocks are still reachable in loss record 33 of 75
+==206456==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==206456==    by 0x407438: ft_calloc (in /home/anassih/Desktop/Projects/final_minishell/minishell)
+==206456==    by 0x4062CE: copy_environment (env_array.c:26)
+==206456==    by 0x4043B2: main (main.c:25)
+==206456== 
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:ft_calloc
+   fun:copy_environment
+   fun:main
+}
+==206456== 3,958 bytes in 65 blocks are still reachable in loss record 52 of 75
+==206456==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==206456==    by 0x407CE9: ft_strdup (in /home/anassih/Desktop/Projects/final_minishell/minishell)
+==206456==    by 0x40630E: copy_environment (env_array.c:32)
+==206456==    by 0x4043B2: main (main.c:25)
+==206456== 
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:ft_strdup
+   fun:copy_environment
+   fun:main
+}
+==206456== LEAK SUMMARY:
+==206456==    definitely lost: 0 bytes in 0 blocks
+==206456==    indirectly lost: 0 bytes in 0 blocks
+==206456==      possibly lost: 0 bytes in 0 blocks
+==206456==    still reachable: 4,630 bytes in 77 blocks
+==206456==         suppressed: 208,279 bytes in 228 blocks
+==206456== 
+==206456== For lists of detected and suppressed errors, rerun with: -s
+==206456== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+[?2004h$ [minishell] > echo | ls
+[?2004lbuiltins
+cleanup.c
+env_utils
+execution
+file
+file2
+includes
+libft
+main.c
+Makefile
+minishell
+minishell_tester
+obj
+parsing
+readline.supp
+signals.c
+valgrind.log
+==206470== 
+==206470== HEAP SUMMARY:
+==206470==     in use at exit: 212,955 bytes in 308 blocks
+==206470==   total heap usage: 593 allocs, 285 frees, 238,154 bytes allocated
+==206470== 
+==206470== 8 bytes in 1 blocks are still reachable in loss record 2 of 75
+==206470==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==206470==    by 0x407438: ft_calloc (in /home/anassih/Desktop/Projects/final_minishell/minishell)
+==206470==    by 0x404761: open_pipes (pipeline_setup.c:38)
+==206470==    by 0x404971: execute_pipeline (pipeline_executor.c:123)
+==206470==    by 0x404363: execute_if_needed (executor.c:56)
+==206470==    by 0x404469: main (main.c:46)
+==206470== 
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:ft_calloc
+   fun:open_pipes
+   fun:execute_pipeline
+   fun:execute_if_needed
+   fun:main
+}
+==206470== 8 bytes in 1 blocks are still reachable in loss record 3 of 75
+==206470==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==206470==    by 0x407438: ft_calloc (in /home/anassih/Desktop/Projects/final_minishell/minishell)
+==206470==    by 0x404828: alloc_pids (pipeline_setup.c:57)
+==206470==    by 0x404987: execute_pipeline (pipeline_executor.c:125)
+==206470==    by 0x404363: execute_if_needed (executor.c:56)
+==206470==    by 0x404469: main (main.c:46)
+==206470== 
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:ft_calloc
+   fun:alloc_pids
+   fun:execute_pipeline
+   fun:execute_if_needed
+   fun:main
+}
+==206470== 8 bytes in 2 blocks are still reachable in loss record 5 of 75
+==206470==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==206470==    by 0x407438: ft_calloc (in /home/anassih/Desktop/Projects/final_minishell/minishell)
+==206470==    by 0x406920: expand_env_vars (env_expand_build.c:87)
+==206470==    by 0x402281: handle_quotes (quotes.c:76)
+==206470==    by 0x401E7C: fill_args (ast_utils.c:124)
+==206470==    by 0x4020DF: tokenize_input (ast_utils.c:161)
+==206470==    by 0x40138E: build_pipeline_list (ast_builder.c:28)
+==206470==    by 0x40131A: build_ast_pipeline (ast_builder.c:59)
+==206470==    by 0x404418: main (main.c:35)
+==206470== 
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:ft_calloc
+   fun:expand_env_vars
+   fun:handle_quotes
+   fun:fill_args
+   fun:tokenize_input
+   fun:build_pipeline_list
+   fun:build_ast_pipeline
+   fun:main
+}
+==206470== 8 bytes in 2 blocks are still reachable in loss record 6 of 75
+==206470==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==206470==    by 0x407438: ft_calloc (in /home/anassih/Desktop/Projects/final_minishell/minishell)
+==206470==    by 0x408403: ft_substr (in /home/anassih/Desktop/Projects/final_minishell/minishell)
+==206470==    by 0x402025: extract_first_command_word (ast_utils.c:31)
+==206470==    by 0x401EEE: fill_args (ast_utils.c:132)
+==206470==    by 0x4020DF: tokenize_input (ast_utils.c:161)
+==206470==    by 0x40138E: build_pipeline_list (ast_builder.c:28)
+==206470==    by 0x40131A: build_ast_pipeline (ast_builder.c:59)
+==206470==    by 0x404418: main (main.c:35)
+==206470== 
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:ft_calloc
+   fun:ft_substr
+   fun:extract_first_command_word
+   fun:fill_args
+   fun:tokenize_input
+   fun:build_pipeline_list
+   fun:build_ast_pipeline
+   fun:main
+}
+==206470== 16 bytes in 1 blocks are still reachable in loss record 12 of 75
+==206470==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==206470==    by 0x404A47: fork_children (pipeline_executor.c:46)
+==206470==    by 0x4049BC: execute_pipeline (pipeline_executor.c:131)
+==206470==    by 0x404363: execute_if_needed (executor.c:56)
+==206470==    by 0x404469: main (main.c:46)
+==206470== 
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:fork_children
+   fun:execute_pipeline
+   fun:execute_if_needed
+   fun:main
+}
+==206470== 32 bytes in 2 blocks are still reachable in loss record 19 of 75
+==206470==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==206470==    by 0x407438: ft_calloc (in /home/anassih/Desktop/Projects/final_minishell/minishell)
+==206470==    by 0x401951: alloc_ast (ast_utils.c:47)
+==206470==    by 0x402098: tokenize_input (ast_utils.c:157)
+==206470==    by 0x40138E: build_pipeline_list (ast_builder.c:28)
+==206470==    by 0x40131A: build_ast_pipeline (ast_builder.c:59)
+==206470==    by 0x404418: main (main.c:35)
+==206470== 
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:ft_calloc
+   fun:alloc_ast
+   fun:tokenize_input
+   fun:build_pipeline_list
+   fun:build_ast_pipeline
+   fun:main
+}
+==206470== 64 bytes in 2 blocks are still reachable in loss record 24 of 75
+==206470==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==206470==    by 0x407438: ft_calloc (in /home/anassih/Desktop/Projects/final_minishell/minishell)
+==206470==    by 0x401922: alloc_ast (ast_utils.c:44)
+==206470==    by 0x402098: tokenize_input (ast_utils.c:157)
+==206470==    by 0x40138E: build_pipeline_list (ast_builder.c:28)
+==206470==    by 0x40131A: build_ast_pipeline (ast_builder.c:59)
+==206470==    by 0x404418: main (main.c:35)
+==206470== 
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:ft_calloc
+   fun:alloc_ast
+   fun:tokenize_input
+   fun:build_pipeline_list
+   fun:build_ast_pipeline
+   fun:main
+}
+==206470== 528 bytes in 1 blocks are still reachable in loss record 33 of 75
+==206470==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==206470==    by 0x407438: ft_calloc (in /home/anassih/Desktop/Projects/final_minishell/minishell)
+==206470==    by 0x4062CE: copy_environment (env_array.c:26)
+==206470==    by 0x4043B2: main (main.c:25)
+==206470== 
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:ft_calloc
+   fun:copy_environment
+   fun:main
+}
+==206470== 3,958 bytes in 65 blocks are still reachable in loss record 52 of 75
+==206470==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==206470==    by 0x407CE9: ft_strdup (in /home/anassih/Desktop/Projects/final_minishell/minishell)
+==206470==    by 0x40630E: copy_environment (env_array.c:32)
+==206470==    by 0x4043B2: main (main.c:25)
+==206470== 
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:ft_strdup
+   fun:copy_environment
+   fun:main
+}
+==206470== LEAK SUMMARY:
+==206470==    definitely lost: 0 bytes in 0 blocks
+==206470==    indirectly lost: 0 bytes in 0 blocks
+==206470==      possibly lost: 0 bytes in 0 blocks
+==206470==    still reachable: 4,630 bytes in 77 blocks
+==206470==         suppressed: 208,325 bytes in 231 blocks
+==206470== 
+==206470== For lists of detected and suppressed errors, rerun with: -s
+==206470== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+[?2004h$ [minishell] > ^C[?2004l
+$ [minishell] > [?2004hecho | ls
+[?2004lbuiltins
+cleanup.c
+env_utils
+execution
+file
+file2
+includes
+libft
+main.c
+Makefile
+minishell
+minishell_tester
+obj
+parsing
+readline.supp
+signals.c
+valgrind.log
+==206472== 
+==206472== HEAP SUMMARY:
+==206472==     in use at exit: 213,001 bytes in 311 blocks
+==206472==   total heap usage: 626 allocs, 315 frees, 238,822 bytes allocated
+==206472== 
+==206472== 8 bytes in 1 blocks are still reachable in loss record 2 of 75
+==206472==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==206472==    by 0x407438: ft_calloc (in /home/anassih/Desktop/Projects/final_minishell/minishell)
+==206472==    by 0x404761: open_pipes (pipeline_setup.c:38)
+==206472==    by 0x404971: execute_pipeline (pipeline_executor.c:123)
+==206472==    by 0x404363: execute_if_needed (executor.c:56)
+==206472==    by 0x404469: main (main.c:46)
+==206472== 
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:ft_calloc
+   fun:open_pipes
+   fun:execute_pipeline
+   fun:execute_if_needed
+   fun:main
+}
+==206472== 8 bytes in 1 blocks are still reachable in loss record 3 of 75
+==206472==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==206472==    by 0x407438: ft_calloc (in /home/anassih/Desktop/Projects/final_minishell/minishell)
+==206472==    by 0x404828: alloc_pids (pipeline_setup.c:57)
+==206472==    by 0x404987: execute_pipeline (pipeline_executor.c:125)
+==206472==    by 0x404363: execute_if_needed (executor.c:56)
+==206472==    by 0x404469: main (main.c:46)
+==206472== 
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:ft_calloc
+   fun:alloc_pids
+   fun:execute_pipeline
+   fun:execute_if_needed
+   fun:main
+}
+==206472== 8 bytes in 2 blocks are still reachable in loss record 5 of 75
+==206472==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==206472==    by 0x407438: ft_calloc (in /home/anassih/Desktop/Projects/final_minishell/minishell)
+==206472==    by 0x406920: expand_env_vars (env_expand_build.c:87)
+==206472==    by 0x402281: handle_quotes (quotes.c:76)
+==206472==    by 0x401E7C: fill_args (ast_utils.c:124)
+==206472==    by 0x4020DF: tokenize_input (ast_utils.c:161)
+==206472==    by 0x40138E: build_pipeline_list (ast_builder.c:28)
+==206472==    by 0x40131A: build_ast_pipeline (ast_builder.c:59)
+==206472==    by 0x404418: main (main.c:35)
+==206472== 
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:ft_calloc
+   fun:expand_env_vars
+   fun:handle_quotes
+   fun:fill_args
+   fun:tokenize_input
+   fun:build_pipeline_list
+   fun:build_ast_pipeline
+   fun:main
+}
+==206472== 8 bytes in 2 blocks are still reachable in loss record 6 of 75
+==206472==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==206472==    by 0x407438: ft_calloc (in /home/anassih/Desktop/Projects/final_minishell/minishell)
+==206472==    by 0x408403: ft_substr (in /home/anassih/Desktop/Projects/final_minishell/minishell)
+==206472==    by 0x402025: extract_first_command_word (ast_utils.c:31)
+==206472==    by 0x401EEE: fill_args (ast_utils.c:132)
+==206472==    by 0x4020DF: tokenize_input (ast_utils.c:161)
+==206472==    by 0x40138E: build_pipeline_list (ast_builder.c:28)
+==206472==    by 0x40131A: build_ast_pipeline (ast_builder.c:59)
+==206472==    by 0x404418: main (main.c:35)
+==206472== 
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:ft_calloc
+   fun:ft_substr
+   fun:extract_first_command_word
+   fun:fill_args
+   fun:tokenize_input
+   fun:build_pipeline_list
+   fun:build_ast_pipeline
+   fun:main
+}
+==206472== 16 bytes in 1 blocks are still reachable in loss record 12 of 75
+==206472==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==206472==    by 0x404A47: fork_children (pipeline_executor.c:46)
+==206472==    by 0x4049BC: execute_pipeline (pipeline_executor.c:131)
+==206472==    by 0x404363: execute_if_needed (executor.c:56)
+==206472==    by 0x404469: main (main.c:46)
+==206472== 
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:fork_children
+   fun:execute_pipeline
+   fun:execute_if_needed
+   fun:main
+}
+==206472== 32 bytes in 2 blocks are still reachable in loss record 18 of 75
+==206472==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==206472==    by 0x407438: ft_calloc (in /home/anassih/Desktop/Projects/final_minishell/minishell)
+==206472==    by 0x401951: alloc_ast (ast_utils.c:47)
+==206472==    by 0x402098: tokenize_input (ast_utils.c:157)
+==206472==    by 0x40138E: build_pipeline_list (ast_builder.c:28)
+==206472==    by 0x40131A: build_ast_pipeline (ast_builder.c:59)
+==206472==    by 0x404418: main (main.c:35)
+==206472== 
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:ft_calloc
+   fun:alloc_ast
+   fun:tokenize_input
+   fun:build_pipeline_list
+   fun:build_ast_pipeline
+   fun:main
+}
+==206472== 64 bytes in 2 blocks are still reachable in loss record 24 of 75
+==206472==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==206472==    by 0x407438: ft_calloc (in /home/anassih/Desktop/Projects/final_minishell/minishell)
+==206472==    by 0x401922: alloc_ast (ast_utils.c:44)
+==206472==    by 0x402098: tokenize_input (ast_utils.c:157)
+==206472==    by 0x40138E: build_pipeline_list (ast_builder.c:28)
+==206472==    by 0x40131A: build_ast_pipeline (ast_builder.c:59)
+==206472==    by 0x404418: main (main.c:35)
+==206472== 
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:ft_calloc
+   fun:alloc_ast
+   fun:tokenize_input
+   fun:build_pipeline_list
+   fun:build_ast_pipeline
+   fun:main
+}
+==206472== 528 bytes in 1 blocks are still reachable in loss record 33 of 75
+==206472==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==206472==    by 0x407438: ft_calloc (in /home/anassih/Desktop/Projects/final_minishell/minishell)
+==206472==    by 0x4062CE: copy_environment (env_array.c:26)
+==206472==    by 0x4043B2: main (main.c:25)
+==206472== 
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:ft_calloc
+   fun:copy_environment
+   fun:main
+}
+==206472== 3,958 bytes in 65 blocks are still reachable in loss record 52 of 75
+==206472==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==206472==    by 0x407CE9: ft_strdup (in /home/anassih/Desktop/Projects/final_minishell/minishell)
+==206472==    by 0x40630E: copy_environment (env_array.c:32)
+==206472==    by 0x4043B2: main (main.c:25)
+==206472== 
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:ft_strdup
+   fun:copy_environment
+   fun:main
+}
+==206472== LEAK SUMMARY:
+==206472==    definitely lost: 0 bytes in 0 blocks
+==206472==    indirectly lost: 0 bytes in 0 blocks
+==206472==      possibly lost: 0 bytes in 0 blocks
+==206472==    still reachable: 4,630 bytes in 77 blocks
+==206472==         suppressed: 208,371 bytes in 234 blocks
+==206472== 
+==206472== For lists of detected and suppressed errors, rerun with: -s
+==206472== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+[?2004h$ [minishell] > [?2004l
+exit
+==206449== 
+==206449== HEAP SUMMARY:
+==206449==     in use at exit: 208,188 bytes in 222 blocks
+==206449==   total heap usage: 629 allocs, 407 frees, 238,864 bytes allocated
+==206449== 
+==206449== LEAK SUMMARY:
+==206449==    definitely lost: 0 bytes in 0 blocks
+==206449==    indirectly lost: 0 bytes in 0 blocks
+==206449==      possibly lost: 0 bytes in 0 blocks
+==206449==    still reachable: 0 bytes in 0 blocks
+==206449==         suppressed: 208,188 bytes in 222 blocks
+==206449== 
+==206449== For lists of detected and suppressed errors, rerun with: -s
+==206449== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)

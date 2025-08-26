@@ -5,7 +5,7 @@
 # include <dirent.h>
 # include <errno.h>
 # include <fcntl.h>
-# include <libft.h>
+# include <../libft/inc/libft.h>
 # include <limits.h>
 # include <readline/history.h>
 # include <readline/readline.h>
@@ -42,6 +42,7 @@ extern volatile sig_atomic_t	g_signal;
 typedef struct s_context
 {
 	char	**env;
+	char	**exported;
 	int		exit_status;
 	pid_t	main_process_pid;
 	int		heredoc_interrupted;
