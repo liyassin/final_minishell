@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 16:38:10 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/26 07:57:03 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/26 11:30:54 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,7 +88,8 @@ static void add_exported(char ***exported, const char *arg)
 		new_list[i] = (*exported)[i];
 	new_list[count] = ft_strdup(arg);
 	new_list[count + 1] = NULL;
-	free(*exported);
+	if (*exported)
+		free_environment(*exported); // Free all old strings and array
 	*exported = new_list;
 	free(name);
 }

@@ -46,6 +46,7 @@ typedef struct s_context
 	int		exit_status;
 	pid_t	main_process_pid;
 	int		heredoc_interrupted;
+	t_ast	*ast_head;
 }	t_context;
 
 // Builtins

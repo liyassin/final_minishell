@@ -6,12 +6,13 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 18:15:30 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/25 04:48:40 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/26 11:45:16 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 #include "../includes/signals.h"
+#include <signal.h>
 
 // Execute one AST node in child: redirs, builtins, or external.
 static void	exec_node(t_ast *node, t_context *ctx)

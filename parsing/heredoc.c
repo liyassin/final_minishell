@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 18:13:43 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/26 09:58:48 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/26 11:45:16 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,9 +17,9 @@ extern volatile sig_atomic_t g_signal;
 
 static void	heredoc_sigint_handler(int sig)
 {
-	g_signal = sig;
-	write(2, "\n", 1);
-	exit(1);
+g_signal = sig;
+write(2, "\n", 1);
+exit(1);
 }
 
 static void	parent_sigint_handler(int sig)

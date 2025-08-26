@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 16:41:57 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/26 09:36:39 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/26 11:45:16 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,12 +22,10 @@ volatile sig_atomic_t g_signal = 0;
 
 void	handle_sigint(int sig)
 {
-	g_signal = SIGINT;
-	(void)sig;
-	write(STDOUT_FILENO, "\n", 1);
-	rl_replace_line("", 0);
-	rl_on_new_line();
-	rl_redisplay();
+g_signal = SIGINT;
+(void)sig;
+write(STDOUT_FILENO, "\n", 1);
+// Do not call rl_replace_line, rl_on_new_line, or rl_redisplay here; let main loop handle prompt
 }
 
 void	setup_shell_signals(void)

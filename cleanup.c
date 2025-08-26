@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/28 17:27:55 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/23 18:11:49 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/26 11:30:55 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,45 +50,5 @@ void	free_split(char **str)
 	free(str);
 }
 
-// Iteratively free an AST list and all redirection structs.
-void	free_ast(t_ast *ast)
-{
-	t_ast	*current;
-	t_ast	*next;
-	t_redir	*redir;
-	t_redir	*next_redir;
-	int		i;
-
-	current = ast;
-	while (current)
-	{
-		next = current->next;
-		if (current->command)
-			free(current->command);
-		if (current->args)
-		{
-			i = 0;
-			while (current->args[i])
-				free(current->args[i++]);
-			free(current->args);
-		}
-		redir = current->redirs;
-		while (redir)
-		{
-			next_redir = redir->next;
-			if (redir->target)
-				free(redir->target);
-			if (redir->type == REDIR_HEREDOC)
-			{
-				if (redir->heredoc_fd[0] != -1)
-					close(redir->heredoc_fd[0]);
-				if (redir->heredoc_fd[1] != -1)
-					close(redir->heredoc_fd[1]);
-			}
-			free(redir);
-			redir = next_redir;
-		}
-		free(current);
-		current = next;
-	}
-}
+// Declaration only, implementation is in ast_utils.c
+void	free_ast(t_ast *ast);

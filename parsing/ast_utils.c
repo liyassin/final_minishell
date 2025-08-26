@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 18:14:09 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/26 09:36:39 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/26 11:30:57 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,44 @@
 #include "../includes/tokenization.h"
 #include "../includes/env_utils.h"
 
+void	free_redirs(t_redir *redir)
+{
+	   t_redir *tmp;
+	   while (redir)
+	   {
+			   tmp = redir->next;
+			   if (redir->target)
+					   free(redir->target);
+			   free(redir);
+			   redir = tmp;
+	   }
+}
+
+void	free_ast(t_ast *ast)
+{
+	   int i;
+	   t_ast *tmp;
+	   while (ast)
+	   {
+			   tmp = ast->next;
+			   if (ast->args)
+			   {
+					   i = 0;
+					   while (ast->args[i])
+					   {
+							   free(ast->args[i]);
+							   i++;
+					   }
+					   free(ast->args);
+			   }
+			   if (ast->command)
+					   free(ast->command);
+			   if (ast->redirs)
+					   free_redirs(ast->redirs);
+			   free(ast);
+			   ast = tmp;
+	   }
+}
 // Extracts the first word after trimming leading spaces/tabs
 static char *extract_first_command_word(char *str)
 {
@@ -102,45 +140,55 @@ int	fill_args(t_ast *ast, char **tokens, t_context *ctx)
 	i = 0;
 	arg_i = 0;
 	int prev_exit_status = ctx->exit_status;
-	while (tokens[i])
-	{
-		if (!ft_strcmp(tokens[i], "<<") && tokens[i + 1])
-			i += 2;
-		else if (!ft_strcmp(tokens[i], ">>") && tokens[i + 1])
-			i += 2;
-		else if (!ft_strcmp(tokens[i], ">") && tokens[i + 1])
-			i += 2;
-		else if (!ft_strcmp(tokens[i], "<") && tokens[i + 1])
-			i += 2;
-		else if (!ft_strcmp(tokens[i], "|"))
-			i++;
-		else
-		{
-			quoted = 0;
-			tok = tokens[i];
-			if ((tok[0] == '"' && tok[ft_strlen(tok) - 1] == '"'))
-				quoted = 1;
-			else if ((tok[0] == '\'' && tok[ft_strlen(tok) - 1] == '\''))
-				quoted = 1;
-			int tmp = ctx->exit_status;
-			ctx->exit_status = prev_exit_status;
-			ast->args[arg_i] = handle_quotes(tok, ctx);
-			ctx->exit_status = tmp;
-			if (!ast->args[arg_i])
-				return (0);
-			if (arg_i == 0)
-			{
-				if (quoted)
-					ast->command = ft_strdup(tok);
-				else
-					ast->command = extract_first_command_word(ast->args[0]);
-				if (!ast->command)
-					return (0);
-			}
-			arg_i++;
-			i++;
-		}
-	}
+	   while (tokens[i])
+	   {
+			   if (!ft_strcmp(tokens[i], "<<") && tokens[i + 1])
+					   i += 2;
+			   else if (!ft_strcmp(tokens[i], ">>") && tokens[i + 1])
+					   i += 2;
+			   else if (!ft_strcmp(tokens[i], ">") && tokens[i + 1])
+					   i += 2;
+			   else if (!ft_strcmp(tokens[i], "<") && tokens[i + 1])
+					   i += 2;
+			   else if (!ft_strcmp(tokens[i], "|"))
+					   i++;
+			   else
+			   {
+					   quoted = 0;
+					   tok = tokens[i];
+					   if ((tok[0] == '"' && tok[ft_strlen(tok) - 1] == '"'))
+							   quoted = 1;
+					   else if ((tok[0] == '\'' && tok[ft_strlen(tok) - 1] == '\''))
+							   quoted = 1;
+					   int tmp = ctx->exit_status;
+					   ctx->exit_status = prev_exit_status;
+					   char *expanded = handle_quotes(tok, ctx);
+					   ctx->exit_status = tmp;
+					   if (!expanded)
+							   return (0);
+					   ast->args[arg_i] = expanded;
+					   if (arg_i == 0)
+					   {
+							   char *cmd_tmp = NULL;
+							   if (quoted)
+							   {
+									   ast->command = ft_strdup(tok);
+							   }
+							   else
+							   {
+									   cmd_tmp = extract_first_command_word(expanded);
+									   ast->command = cmd_tmp;
+							   }
+							   if (!ast->command)
+							   {
+									   free(expanded);
+									   return (0);
+							   }
+					   }
+					   arg_i++;
+					   i++;
+			   }
+	   }
 	ast->args[arg_i] = NULL;
 	return (1);
 }
