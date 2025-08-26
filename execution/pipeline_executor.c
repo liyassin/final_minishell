@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 18:15:30 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/26 23:27:24 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/26 23:49:00 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,27 +52,26 @@ static t_ast	*get_nth_node(t_ast *ast, int n)
 	return (cur);
 }
 
-static int	fork_children(t_ast *ast, t_context *ctx, int n,
-		int pipes[][2], pid_t *pids)
+static int	fork_children(t_ast *ast, t_context *ctx, t_pipeline_data *data)
 {
 	t_ast	*cur;
 	int		i;
 
-	i = n - 1;
+	i = data->n - 1;
 	while (i >= 0)
 	{
 		cur = get_nth_node(ast, i);
 		if (!cur)
 			return (-1);
-		pids[i] = fork();
-		if (pids[i] == 0)
+		data->pids[i] = fork();
+		if (data->pids[i] == 0)
 		{
 			reset_default_signals();
-			setup_pipes(i, n, pipes);
-			close_pipes(n, pipes);
+			setup_pipes(i, data->n, data->pipes);
+			close_pipes(data->n, data->pipes);
 			exec_node(cur, ctx);
 		}
-		else if (pids[i] < 0)
+		else if (data->pids[i] < 0)
 		{
 			ctx->exit_status = 1;
 			perror("minishell: fork");
@@ -125,7 +124,8 @@ void	execute_pipeline(t_ast *ast, t_context *ctx)
 {
 	int		n;
 	int		(*pipes)[2];
-	pid_t	*pids;
+	pid_t		*pids;
+	t_pipeline_data	data;
 
 	if (!ast || !ctx)
 		return ;
@@ -134,7 +134,10 @@ void	execute_pipeline(t_ast *ast, t_context *ctx)
 		return ;
 	if (setup_pipeline_resources(n, &pipes, &pids) < 0)
 		return ;
-	if (fork_children(ast, ctx, n, pipes, pids) < 0)
+	data.n = n;
+	data.pipes = pipes;
+	data.pids = pids;
+	if (fork_children(ast, ctx, &data) < 0)
 	{
 		free(pipes);
 		free(pids);

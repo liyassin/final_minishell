@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 18:12:24 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/23 18:12:24 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/27 00:37:48 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,9 +86,8 @@ void	add_token(char ***tokens, size_t *count, size_t *cap, char *token)
 	(*tokens)[*count] = NULL;
 }
 
-// Handle only mandatory operators (no && or ||)
-void	handle_operator(const char *input, size_t *i, char ***tokens,
-		size_t *count, size_t *cap)
+// Extract operator string and advance index
+static char	*extract_operator(const char *input, size_t *i)
 {
 	char	op[3];
 
@@ -102,5 +101,13 @@ void	handle_operator(const char *input, size_t *i, char ***tokens,
 		op[2] = '\0';
 		(*i)++;
 	}
-	add_token(tokens, count, cap, ft_strdup(op));
+	return (ft_strdup(op));
+}
+
+void	handle_operator(const char *input, size_t *i, t_token_ctx *ctx)
+{
+	char	*op_str;
+
+	op_str = extract_operator(input, i);
+	add_token(ctx->tokens, ctx->count, ctx->cap, op_str);
 }

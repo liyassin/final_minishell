@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 18:13:02 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/23 18:13:07 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/27 00:16:20 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,69 +14,78 @@
 #include "../includes/tokenization.h"
 #include "../includes/env_utils.h"
 
-static char	*strip_and_validate_quotes(char *token, int *error)
+static char	*process_quoted_part(char *token, size_t *i, t_context *ctx)
 {
-	char	*res;
-	size_t	i;
-	size_t	j;
-	int		in_dq;
-	int		in_sq;
+	char	quote_char;
+	size_t	start;
+	char	*part;
+	char	*temp;
 
-	res = ft_calloc(ft_strlen(token) + 1, 1);
-	if (!res)
+	quote_char = token[*i];
+	start = (*i)++;
+	while (token[*i] && token[*i] != quote_char)
+		(*i)++;
+	if (!token[*i])
 		return (NULL);
+	(*i)++;
+	part = ft_substr(token, start, *i - start);
+	if (quote_char == '\'')
+		temp = ft_substr(part, 1, ft_strlen(part) - 2);
+	else
+		temp = process_double_quotes(part, ctx);
+	free(part);
+	return (temp);
+}
+
+static char	*process_unquoted_part(char *token, size_t *i, t_context *ctx)
+{
+	size_t	start;
+	char	*part;
+	char	*temp;
+
+	start = *i;
+	while (token[*i] && token[*i] != '\'' && token[*i] != '"')
+		(*i)++;
+	part = ft_substr(token, start, *i - start);
+	temp = expand_env_vars(part, ctx->env, ctx->exit_status);
+	free(part);
+	return (temp);
+}
+
+static char	*process_mixed_token(char *token, t_context *ctx)
+{
+	char	*result;
+	char	*temp;
+	char	*joined;
+	size_t	i;
+
+	result = ft_strdup("");
 	i = 0;
-	j = 0;
-	in_dq = 0;
-	in_sq = 0;
-	while (token[i])
+	while (result && token[i])
 	{
-		if (token[i] == '"' && !in_sq)
-			in_dq = !in_dq;
-		else if (token[i] == '\'' && !in_dq)
-			in_sq = !in_sq;
-		else if (in_dq && token[i] == '\\' && token[i + 1]
-			&& (token[i + 1] == '"' || token[i + 1] == '\\'
-				||token[i + 1] == '$'))
-			res[j++] = token[++i];
+		if (token[i] == '\'' || token[i] == '"')
+			temp = process_quoted_part(token, &i, ctx);
 		else
-			res[j++] = token[i];
-		i++;
+			temp = process_unquoted_part(token, &i, ctx);
+		if (!temp)
+		{
+			free(result);
+			return (NULL);
+		}
+		joined = ft_strjoin(result, temp);
+		free(result);
+		free(temp);
+		result = joined;
 	}
-	res[j] = '\0';
-	if (in_dq || in_sq)
-		*error = 1;
-	return (res);
+	return (result);
 }
 
 // Updated quote handling with context and error detection
 char	*handle_quotes(char *token, t_context *ctx)
 {
-	char	*clean;
-	char	*sub;
-	char	*env;
-	int		error;
-	int		single;
-
 	if (!token)
 		return (NULL);
-	single = (token[0] == '\'' && token[ft_strlen(token) - 1] == '\'');
-	error = 0;
-	clean = strip_and_validate_quotes(token, &error);
-	if (error || !clean)
-	{
-		ft_putstr_fd("minishell: error: unmatched quote\n", STDERR_FILENO);
-		ctx->exit_status = 2;
-		free(clean);
-		return (NULL);
-	}
-	if (single)
-		return (clean);
-	sub = handle_command_substitution(clean, ctx);
-	env = expand_env_vars(sub, ctx->env, ctx->exit_status);
-	free(clean);
-	free(sub);
-	return (env);
+	return (process_mixed_token(token, ctx));
 }
 
 // Double quote processing now uses context

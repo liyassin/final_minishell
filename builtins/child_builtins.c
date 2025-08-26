@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 18:23:05 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/26 23:27:24 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/27 00:16:20 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,9 +59,17 @@ int	builtin_pwd(t_context *ctx)
 static int	parse_echo_flags(char **args, int *i, int *newline, int *escape)
 {
 	int	j;
+	int	valid;
 
 	while (args[*i] && args[*i][0] == '-')
 	{
+		j = 1;
+		valid = 1;
+		while (args[*i][j] && valid)
+			if (args[*i][j++] != 'n' && args[*i][j - 1] != 'e')
+				valid = 0;
+		if (!valid)
+			break ;
 		j = 1;
 		while (args[*i][j])
 		{
@@ -69,38 +77,17 @@ static int	parse_echo_flags(char **args, int *i, int *newline, int *escape)
 				*newline = 0;
 			else if (args[*i][j] == 'e')
 				*escape = 1;
-			else
-				break ;
 			j++;
 		}
-		if (args[*i][j] != '\0')
-			break ;
 		(*i)++;
 	}
 	return (*i);
 }
 
-static void	write_escape_sequence(char c)
-{
-	if (c == 'n')
-		write(1, "\n", 1);
-	else if (c == 't')
-		write(1, "\t", 1);
-	else if (c == 'r')
-		write(1, "\r", 1);
-	else if (c == 'b')
-		write(1, "\b", 1);
-	else if (c == 'v')
-		write(1, "\v", 1);
-	else if (c == 'a')
-		write(1, "\a", 1);
-	else
-		write(1, "\\", 1);
-}
-
 static void	print_echo_arg(char *arg, int escape)
 {
-	int	j;
+	int		j;
+	char	*pos;
 
 	j = 0;
 	while (arg[j])
@@ -108,7 +95,15 @@ static void	print_echo_arg(char *arg, int escape)
 		if (escape && arg[j] == '\\' && arg[j + 1])
 		{
 			j++;
-			write_escape_sequence(arg[j]);
+			pos = ft_strchr("ntrb", arg[j]);
+			if (pos)
+				write(1, &"\n\t\r\b"[pos - "ntrb"], 1);
+			else if (arg[j] == 'v')
+				write(1, "\v", 1);
+			else if (arg[j] == 'a')
+				write(1, "\a", 1);
+			else
+				write(1, "\\", 1);
 		}
 		else
 			write(1, &arg[j], 1);

@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 21:35:01 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/26 23:27:24 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/26 23:49:00 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,5 +80,12 @@ pid_t		*alloc_pids(int n);
 void		setup_pipes(int i, int n, int pipes[][2]);
 void		close_pipes(int n, int pipes[][2]);
 void		cleanup_shell(t_ast *ast, t_context *ctx);
+
+typedef struct s_pipeline_data
+{
+	int		n;
+	int		(*pipes)[2];
+	pid_t	*pids;
+}	t_pipeline_data;
 
 #endif

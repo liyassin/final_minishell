@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 18:14:09 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/26 23:27:24 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/27 00:37:48 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -226,6 +226,43 @@ int	fill_args(t_ast *ast, char **tokens, t_context *ctx)
 	return (1);
 }
 
+// Validate syntax and print appropriate error messages
+static int	check_pipe_start(char **tokens, t_context *ctx)
+{
+	if (!ft_strcmp(tokens[0], "|"))
+	{
+		ft_putstr_fd("bash: syntax error near unexpected token `|'\n",
+			STDERR_FILENO);
+		ctx->exit_status = 2;
+		return (0);
+	}
+	return (1);
+}
+
+static int	validate_syntax(char **tokens, t_context *ctx)
+{
+	int	i;
+
+	if (!tokens || !tokens[0])
+		return (1);
+	if (!check_pipe_start(tokens, ctx))
+		return (0);
+	i = 0;
+	while (tokens[i])
+	{
+		if (!ft_strcmp(tokens[i], "|") && tokens[i + 1]
+			&& !ft_strcmp(tokens[i + 1], "|"))
+		{
+			ft_putstr_fd("bash: syntax error near unexpected token `|'\n",
+				STDERR_FILENO);
+			ctx->exit_status = 2;
+			return (0);
+		}
+		i++;
+	}
+	return (1);
+}
+
 t_ast	*tokenize_input(const char *input, t_context *ctx)
 {
 	char	**tokens;
@@ -234,10 +271,9 @@ t_ast	*tokenize_input(const char *input, t_context *ctx)
 
 	tokens = smart_split(input);
 	if (!tokens)
-	{
-		ctx->exit_status = 2;
-		return (NULL);
-	}
+		return (ctx->exit_status = 2, (t_ast *) NULL);
+	if (!validate_syntax(tokens, ctx))
+		return (free_split(tokens), (t_ast *) NULL);
 	ast = alloc_ast(tokens);
 	if (!ast)
 		return (free_split(tokens), (t_ast *) NULL);

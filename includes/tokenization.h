@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 21:35:01 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/26 23:27:24 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/27 00:37:48 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,13 @@ typedef struct s_split_ctx
 	t_split_state	state;
 }	t_split_ctx;
 
+typedef struct s_token_ctx
+{
+	char			***tokens;
+	size_t			*count;
+	size_t			*cap;
+}	t_token_ctx;
+
 t_ast	*tokenize_input(const char *input, t_context *ctx);
 char	*process_double_quotes(const char *token, t_context *ctx);
 char	*handle_quotes(char *token, t_context *ctx);
@@ -84,11 +91,8 @@ void	update_state_and_append(char c, t_split_ctx *ctx);
 void	*ft_realloc(void *ptr, size_t old_size, size_t new_size);
 char	*append_char(char *str, char c, size_t *len, size_t *cap);
 void	add_token(char ***tokens, size_t *count, size_t *cap, char *token);
-void	handle_operator(const char *input, size_t *i, char ***tokens,
-			size_t *count);
-char	*trim_segment(const char *line, size_t start, size_t end);
-
-t_ast	*alloc_ast(char **tokens);
+void	handle_operator(const char *input, size_t *i, t_token_ctx *ctx);
+char	*trim_segment(const char *line, size_t start, size_t end);t_ast	*alloc_ast(char **tokens);
 void	fill_redirections(t_ast *ast, char **tokens, t_context *ctx);
 int		fill_args(t_ast *ast, char **tokens, t_context *ctx);
 t_ast	*tokenize_input(const char *input, t_context *ctx);
