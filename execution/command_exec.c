@@ -83,7 +83,6 @@ void	exec_command(t_ast *ast, t_context *ctx)
 	skip_empty_command_args(ast);
 	   if (!ast->command || ast->command[0] == '\0')
 	   {
-			   // Ignore truly empty commands: just redraw prompt, do not print error or exit
 			   int has_heredoc = 0;
 			   t_redir *redir = ast->redirs;
 			   while (redir)
@@ -95,7 +94,16 @@ void	exec_command(t_ast *ast, t_context *ctx)
 					   }
 					   redir = redir->next;
 			   }
-			   if (!(ctx->exit_status == 130 || g_signal == SIGINT) && !has_heredoc && ast->args && ast->args[0] && ast->args[0][0] != '\0') {
+			   int is_arg_empty = 1;
+			   if (ast->args && ast->args[0])
+			   {
+					   size_t i = 0;
+					   while (ast->args[0][i] && ft_isspace((unsigned char)ast->args[0][i]))
+							   i++;
+					   if (ast->args[0][i] != '\0')
+							   is_arg_empty = 0;
+			   }
+			   if (!(ctx->exit_status == 130 || g_signal == SIGINT) && !has_heredoc && !is_arg_empty) {
 					   handle_command_not_found(ast->command);
 					   ctx->exit_status = 127;
 			   }

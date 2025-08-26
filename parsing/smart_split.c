@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 18:12:38 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/26 04:27:38 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/26 10:20:13 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,9 +36,37 @@ static char	**split_loop(const char *input)
 		free_split(ctx.tokens);
 		return (NULL);
 	}
-	if (ctx.cur)
-		flush_token(&ctx);
-	return (ctx.tokens);
+	   if (ctx.cur)
+			   flush_token(&ctx);
+	   /* Remove tokens that are only whitespace */
+	   size_t	j;
+	   size_t	k;
+	   size_t	out_count;
+	   char	*tok;
+
+	   out_count = 0;
+	   j = 0;
+	   while (ctx.tokens && ctx.tokens[j])
+	   {
+			   tok = ctx.tokens[j];
+			   k = 0;
+			   while (tok[k] && ft_isspace((unsigned char)tok[k]))
+					   k++;
+			   if (tok[k] == '\0')
+			   {
+					   free(tok);
+					   ctx.tokens[j] = NULL;
+			   }
+			   else
+			   {
+					   ctx.tokens[out_count] = tok;
+					   out_count++;
+			   }
+			   j++;
+	   }
+	   if (ctx.tokens)
+			   ctx.tokens[out_count] = NULL;
+	   return (ctx.tokens);
 }
 
 char	**smart_split(const char *input)
