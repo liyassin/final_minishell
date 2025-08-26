@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 18:23:05 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/26 09:36:39 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/26 23:27:24 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,8 @@
 // env builtin: print all VAR=VALUE entries.
 int	builtin_env(t_context *ctx)
 {
-	int i;
-	char *eq;
+	int		i;
+	char	*eq;
 
 	if (!ctx->env)
 	{
@@ -26,13 +26,13 @@ int	builtin_env(t_context *ctx)
 		return (1);
 	}
 	i = 0;
-	   while (ctx->env[i])
-	   {
-			   eq = ft_strchr(ctx->env[i], '=');
-			   if (eq)
-					   ft_putendl_fd(ctx->env[i], STDOUT_FILENO);
-			   i++;
-	   }
+	while (ctx->env[i])
+	{
+		eq = ft_strchr(ctx->env[i], '=');
+		if (eq)
+			ft_putendl_fd(ctx->env[i], STDOUT_FILENO);
+		i++;
+	}
 	ctx->exit_status = 0;
 	return (0);
 }
@@ -56,67 +56,85 @@ int	builtin_pwd(t_context *ctx)
 	return (1);
 }
 
-int	builtin_echo(char **args, t_context *ctx)
+static int	parse_echo_flags(char **args, int *i, int *newline, int *escape)
 {
-	int i;
-	int newline;
-	int escape;
-	int j;
-	(void)ctx;
+	int	j;
 
-	i = 1;
-	newline = 1;
-	escape = 0;
-	while (args[i] && args[i][0] == '-')
+	while (args[*i] && args[*i][0] == '-')
 	{
 		j = 1;
-		while (args[i][j])
+		while (args[*i][j])
 		{
-			if (args[i][j] == 'n')
-				newline = 0;
-			else if (args[i][j] == 'e')
-				escape = 1;
+			if (args[*i][j] == 'n')
+				*newline = 0;
+			else if (args[*i][j] == 'e')
+				*escape = 1;
 			else
 				break ;
 			j++;
 		}
-		if (args[i][j] != '\0')
+		if (args[*i][j] != '\0')
 			break ;
-		i++;
+		(*i)++;
 	}
+	return (*i);
+}
+
+static void	write_escape_sequence(char c)
+{
+	if (c == 'n')
+		write(1, "\n", 1);
+	else if (c == 't')
+		write(1, "\t", 1);
+	else if (c == 'r')
+		write(1, "\r", 1);
+	else if (c == 'b')
+		write(1, "\b", 1);
+	else if (c == 'v')
+		write(1, "\v", 1);
+	else if (c == 'a')
+		write(1, "\a", 1);
+	else
+		write(1, "\\", 1);
+}
+
+static void	print_echo_arg(char *arg, int escape)
+{
+	int	j;
+
+	j = 0;
+	while (arg[j])
+	{
+		if (escape && arg[j] == '\\' && arg[j + 1])
+		{
+			j++;
+			write_escape_sequence(arg[j]);
+		}
+		else
+			write(1, &arg[j], 1);
+		j++;
+	}
+}
+
+int	builtin_echo(char **args, t_context *ctx)
+{
+	int	i;
+	int	newline;
+	int	escape;
+
+	(void)ctx;
+	i = 1;
+	newline = 1;
+	escape = 0;
+	parse_echo_flags(args, &i, &newline, &escape);
 	while (args[i])
 	{
-		j = 0;
-		while (args[i][j])
-		{
-			if (escape && args[i][j] == '\\' && args[i][j + 1])
-			{
-				j++;
-				if (args[i][j] == 'n')
-					write(1, "\n", 1);
-				else if (args[i][j] == 't')
-					write(1, "\t", 1);
-				else if (args[i][j] == 'r')
-					write(1, "\r", 1);
-				else if (args[i][j] == 'b')
-					write(1, "\b", 1);
-				else if (args[i][j] == 'v')
-					write(1, "\v", 1);
-				else if (args[i][j] == 'a')
-					write(1, "\a", 1);
-				else
-					write(1, "\\", 1);
-			}
-			else
-				write(1, &args[i][j], 1);
-			j++;
-		}
+		print_echo_arg(args[i], escape);
 		if (args[i + 1])
 			write(1, " ", 1);
 		i++;
 	}
 	if (newline)
 		write(1, "\n", 1);
-	// Do not reset exit_status on success; retain previous value
 	return (0);
 }

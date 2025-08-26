@@ -1,10 +1,21 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   builtins.h                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/08/26 21:35:01 by anassih           #+#    #+#             */
+/*   Updated: 2025/08/26 23:27:24 by anassih          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef BUILTINS_H
 # define BUILTINS_H
 
-// Special return code to signal shell exit
 # define EXIT_BUILTIN_SIGNAL 255
 
-# include "minishell.h"
+typedef struct s_context	t_context;
 
 // Built-in function prototypes with context
 int	builtin_exit(char **args, t_context *ctx);

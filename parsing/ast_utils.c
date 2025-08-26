@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 18:14:09 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/26 11:30:57 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/26 23:27:24 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,50 +16,53 @@
 
 void	free_redirs(t_redir *redir)
 {
-	   t_redir *tmp;
-	   while (redir)
-	   {
-			   tmp = redir->next;
-			   if (redir->target)
-					   free(redir->target);
-			   free(redir);
-			   redir = tmp;
-	   }
+	t_redir	*tmp;
+
+	while (redir)
+	{
+		tmp = redir->next;
+		if (redir->target)
+			free(redir->target);
+		free(redir);
+		redir = tmp;
+	}
 }
 
 void	free_ast(t_ast *ast)
 {
-	   int i;
-	   t_ast *tmp;
-	   while (ast)
-	   {
-			   tmp = ast->next;
-			   if (ast->args)
-			   {
-					   i = 0;
-					   while (ast->args[i])
-					   {
-							   free(ast->args[i]);
-							   i++;
-					   }
-					   free(ast->args);
-			   }
-			   if (ast->command)
-					   free(ast->command);
-			   if (ast->redirs)
-					   free_redirs(ast->redirs);
-			   free(ast);
-			   ast = tmp;
-	   }
-}
-// Extracts the first word after trimming leading spaces/tabs
-static char *extract_first_command_word(char *str)
-{
-	char    *trimmed;
-	char    *first_word;
-	size_t  j = 0;
-	size_t  len;
+	int		i;
+	t_ast	*tmp;
 
+	while (ast)
+	{
+		tmp = ast->next;
+		if (ast->args)
+		{
+			i = 0;
+			while (ast->args[i])
+			{
+				free(ast->args[i]);
+				i++;
+			}
+			free(ast->args);
+		}
+		if (ast->command)
+			free(ast->command);
+		if (ast->redirs)
+			free_redirs(ast->redirs);
+		free(ast);
+		ast = tmp;
+	}
+}
+
+static char	*extract_first_command_word(char *str)
+{
+	char	*trimmed;
+	char	*first_word;
+	size_t	j;
+	size_t	len;
+
+	j = 0;
 	trimmed = ft_strtrim(str, " \t");
 	if (!trimmed)
 		return (NULL);
@@ -88,6 +91,40 @@ t_ast	*alloc_ast(char **tokens)
 	return (ast);
 }
 
+static void	add_redir_to_list(t_redir ***tail, t_redir_type type, char *target,
+		t_context *ctx)
+{
+	**tail = create_redir_node(type, target, ctx);
+	if (**tail)
+		*tail = &(**tail)->next;
+}
+
+static int	process_redirection_token(t_redir ***tail, char **tokens, int i,
+		t_context *ctx)
+{
+	if (!ft_strcmp(tokens[i], "<<") && tokens[i + 1])
+	{
+		add_redir_to_list(tail, REDIR_HEREDOC, tokens[i + 1], ctx);
+		return (i + 2);
+	}
+	else if (!ft_strcmp(tokens[i], ">>") && tokens[i + 1])
+	{
+		add_redir_to_list(tail, REDIR_APPEND, tokens[i + 1], ctx);
+		return (i + 2);
+	}
+	else if (!ft_strcmp(tokens[i], ">") && tokens[i + 1])
+	{
+		add_redir_to_list(tail, REDIR_OUT, tokens[i + 1], ctx);
+		return (i + 2);
+	}
+	else if (!ft_strcmp(tokens[i], "<") && tokens[i + 1])
+	{
+		add_redir_to_list(tail, REDIR_IN, tokens[i + 1], ctx);
+		return (i + 2);
+	}
+	return (i + 1);
+}
+
 void	fill_redirections(t_ast *ast, char **tokens, t_context *ctx)
 {
 	t_redir	**tail;
@@ -96,104 +133,99 @@ void	fill_redirections(t_ast *ast, char **tokens, t_context *ctx)
 	tail = &ast->redirs;
 	i = 0;
 	while (tokens[i])
+		i = process_redirection_token(&tail, tokens, i, ctx);
+}
+
+static int	skip_redirection_tokens(char **tokens, int i)
+{
+	if (!ft_strcmp(tokens[i], "<<") && tokens[i + 1])
+		return (i + 2);
+	else if (!ft_strcmp(tokens[i], ">>") && tokens[i + 1])
+		return (i + 2);
+	else if (!ft_strcmp(tokens[i], ">") && tokens[i + 1])
+		return (i + 2);
+	else if (!ft_strcmp(tokens[i], "<") && tokens[i + 1])
+		return (i + 2);
+	else if (!ft_strcmp(tokens[i], "|"))
+		return (i + 1);
+	return (-1);
+}
+
+static int	set_command_if_first_arg(t_ast *ast, char *tok, char *expanded,
+		int quoted)
+{
+	char	*cmd_tmp;
+
+	cmd_tmp = NULL;
+	if (quoted)
+		ast->command = ft_strdup(tok);
+	else
 	{
-		if (!ft_strcmp(tokens[i], "<<") && tokens[i + 1])
-		{
-			*tail = create_redir_node(REDIR_HEREDOC, tokens[i + 1], ctx);
-			if (*tail)
-				tail = &(*tail)->next;
-			i += 2;
-		}
-		else if (!ft_strcmp(tokens[i], ">>") && tokens[i + 1])
-		{
-			*tail = create_redir_node(REDIR_APPEND, tokens[i + 1], ctx);
-			if (*tail)
-				tail = &(*tail)->next;
-			i += 2;
-		}
-		else if (!ft_strcmp(tokens[i], ">") && tokens[i + 1])
-		{
-			*tail = create_redir_node(REDIR_OUT, tokens[i + 1], ctx);
-			if (*tail)
-				tail = &(*tail)->next;
-			i += 2;
-		}
-		else if (!ft_strcmp(tokens[i], "<") && tokens[i + 1])
-		{
-			*tail = create_redir_node(REDIR_IN, tokens[i + 1], ctx);
-			if (*tail)
-				tail = &(*tail)->next;
-			i += 2;
-		}
-		else
-			i++;
+		cmd_tmp = extract_first_command_word(expanded);
+		ast->command = cmd_tmp;
 	}
+	if (!ast->command)
+	{
+		free(expanded);
+		return (0);
+	}
+	return (1);
+}
+
+static int	process_argument_token(t_ast *ast, char *tok, int arg_i,
+		t_context *ctx)
+{
+	int		quoted;
+	int		tmp;
+	char	*expanded;
+
+	quoted = 0;
+	if ((tok[0] == '"' && tok[ft_strlen(tok) - 1] == '"'))
+		quoted = 1;
+	else if ((tok[0] == '\'' && tok[ft_strlen(tok) - 1] == '\''))
+		quoted = 1;
+	tmp = ctx->exit_status;
+	expanded = handle_quotes(tok, ctx);
+	ctx->exit_status = tmp;
+	if (!expanded)
+		return (0);
+	ast->args[arg_i] = expanded;
+	if (arg_i == 0)
+	{
+		if (!set_command_if_first_arg(ast, tok, expanded, quoted))
+			return (0);
+	}
+	return (1);
 }
 
 int	fill_args(t_ast *ast, char **tokens, t_context *ctx)
 {
 	int		i;
 	int		arg_i;
-	int		quoted;
-	char	*tok;
+	int		skip_result;
+	int		prev_exit_status;
 
 	i = 0;
 	arg_i = 0;
-	int prev_exit_status = ctx->exit_status;
-	   while (tokens[i])
-	   {
-			   if (!ft_strcmp(tokens[i], "<<") && tokens[i + 1])
-					   i += 2;
-			   else if (!ft_strcmp(tokens[i], ">>") && tokens[i + 1])
-					   i += 2;
-			   else if (!ft_strcmp(tokens[i], ">") && tokens[i + 1])
-					   i += 2;
-			   else if (!ft_strcmp(tokens[i], "<") && tokens[i + 1])
-					   i += 2;
-			   else if (!ft_strcmp(tokens[i], "|"))
-					   i++;
-			   else
-			   {
-					   quoted = 0;
-					   tok = tokens[i];
-					   if ((tok[0] == '"' && tok[ft_strlen(tok) - 1] == '"'))
-							   quoted = 1;
-					   else if ((tok[0] == '\'' && tok[ft_strlen(tok) - 1] == '\''))
-							   quoted = 1;
-					   int tmp = ctx->exit_status;
-					   ctx->exit_status = prev_exit_status;
-					   char *expanded = handle_quotes(tok, ctx);
-					   ctx->exit_status = tmp;
-					   if (!expanded)
-							   return (0);
-					   ast->args[arg_i] = expanded;
-					   if (arg_i == 0)
-					   {
-							   char *cmd_tmp = NULL;
-							   if (quoted)
-							   {
-									   ast->command = ft_strdup(tok);
-							   }
-							   else
-							   {
-									   cmd_tmp = extract_first_command_word(expanded);
-									   ast->command = cmd_tmp;
-							   }
-							   if (!ast->command)
-							   {
-									   free(expanded);
-									   return (0);
-							   }
-					   }
-					   arg_i++;
-					   i++;
-			   }
-	   }
+	prev_exit_status = ctx->exit_status;
+	while (tokens[i])
+	{
+		skip_result = skip_redirection_tokens(tokens, i);
+		if (skip_result != -1)
+			i = skip_result;
+		else
+		{
+			ctx->exit_status = prev_exit_status;
+			if (!process_argument_token(ast, tokens[i], arg_i, ctx))
+				return (0);
+			arg_i++;
+			i++;
+		}
+	}
 	ast->args[arg_i] = NULL;
 	return (1);
 }
 
-// Core tokenizer → AST builder
 t_ast	*tokenize_input(const char *input, t_context *ctx)
 {
 	char	**tokens;
@@ -211,7 +243,6 @@ t_ast	*tokenize_input(const char *input, t_context *ctx)
 		return (free_split(tokens), (t_ast *) NULL);
 	fill_redirections(ast, tokens, ctx);
 	ok = fill_args(ast, tokens, ctx);
-	// If no args/command but heredoc redir exists, keep AST node
 	if (!ok && ast->redirs && ast->redirs->type == REDIR_HEREDOC)
 		ok = 1;
 	free_split(tokens);

@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 18:23:25 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/23 18:49:36 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/26 23:27:24 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,6 @@ static void	update_pwd_env(t_context *ctx)
 		free(cwd);
 	}
 }
-
 
 static int	cd_perform(const char *path, t_context *ctx)
 {

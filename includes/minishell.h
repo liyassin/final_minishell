@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   minishell.h                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/08/26 21:35:01 by anassih           #+#    #+#             */
+/*   Updated: 2025/08/26 23:27:24 by anassih          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
@@ -17,17 +29,15 @@
 # include <sys/types.h>
 # include <sys/wait.h>
 # include <unistd.h>
-
-// Add forward declarations before including other headers
-typedef struct	s_ast t_ast;
-typedef struct	s_redir t_redir;
-typedef struct	s_context t_context;
 # include "builtins.h"
 # include "env_utils.h"
 # include "signals.h"
 # include "tokenization.h"
 
-// Define builtin types
+typedef struct s_ast		t_ast;
+typedef struct s_redir		t_redir;
+typedef struct s_context	t_context;
+
 typedef enum e_builtin
 {
 	NOT_BUILTIN,
@@ -35,10 +45,8 @@ typedef enum e_builtin
 	CHILD_BUILTIN
 }	t_builtin;
 
-// Changed to single-purpose signal variable
-extern volatile sig_atomic_t	g_signal;
+extern volatile sig_atomic_t		g_signal;
 
-// Context structure for environment and exit status
 typedef struct s_context
 {
 	char	**env;
@@ -49,20 +57,16 @@ typedef struct s_context
 	t_ast	*ast_head;
 }	t_context;
 
-// Builtins
 t_builtin	get_builtin_type(const char *cmd);
 int			handle_builtin(char **args, t_context *ctx);
 
-//  Command lookup & redirection
 char		*find_command_path(char *cmd, t_context *ctx);
 int			handle_redirection(t_ast *ast);
 
-//  Pipeline execution
 void		exec_command(t_ast *ast, t_context *ctx);
 void		execute_pipeline(t_ast *ast, t_context *ctx);
 t_ast		*build_ast_pipeline(char *input, t_context *ctx);
 
-//  Helpers
 char		**split_on_pipe(const char *line);
 char		*join_free(char *s1, char *s2);
 char		*join_free_const(char *s1, const char *s2);

@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 18:15:30 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/26 11:45:16 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/26 23:27:24 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,46 +36,50 @@ static void	exec_node(t_ast *node, t_context *ctx)
 	exit(126);
 }
 
-static int	fork_children(t_ast *ast, t_context *ctx,
-	int n, int pipes[][2], pid_t *pids)
+// Get the nth node from the AST linked list
+static t_ast	*get_nth_node(t_ast *ast, int n)
 {
-	int		idx;
+	int		i;
 	t_ast	*cur;
-	t_ast	**nodes;
+
+	cur = ast;
+	i = 0;
+	while (cur && i < n)
+	{
+		cur = cur->next;
+		i++;
+	}
+	return (cur);
+}
+
+static int	fork_children(t_ast *ast, t_context *ctx, int n,
+		int pipes[][2], pid_t *pids)
+{
+	t_ast	*cur;
 	int		i;
 
-	nodes = (t_ast **)malloc(sizeof(t_ast *) * n);
-	if (!nodes)
-		return (-1);
-	cur = ast;
-	idx = 0;
-	while (cur && idx < n)
-	{
-		nodes[idx] = cur;
-		idx++;
-		cur = cur->next;
-	}
 	i = n - 1;
 	while (i >= 0)
 	{
+		cur = get_nth_node(ast, i);
+		if (!cur)
+			return (-1);
 		pids[i] = fork();
 		if (pids[i] == 0)
 		{
 			reset_default_signals();
 			setup_pipes(i, n, pipes);
 			close_pipes(n, pipes);
-			exec_node(nodes[i], ctx);
+			exec_node(cur, ctx);
 		}
 		else if (pids[i] < 0)
 		{
 			ctx->exit_status = 1;
 			perror("minishell: fork");
-			free(nodes);
 			return (-1);
 		}
 		i--;
 	}
-	free(nodes);
 	return (0);
 }
 
@@ -104,6 +108,19 @@ static void	wait_pipeline(int n, pid_t *pids, t_context *ctx)
 }
 
 // Execute an AST pipeline by forking and wiring pipes.
+static int	setup_pipeline_resources(int n, int (**pipes)[2], pid_t **pids)
+{
+	if (open_pipes(n, pipes) < 0)
+		return (-1);
+	*pids = alloc_pids(n);
+	if (!*pids)
+	{
+		free(*pipes);
+		return (-1);
+	}
+	return (0);
+}
+
 void	execute_pipeline(t_ast *ast, t_context *ctx)
 {
 	int		n;
@@ -115,16 +132,8 @@ void	execute_pipeline(t_ast *ast, t_context *ctx)
 	n = count_pipeline(ast);
 	if (n <= 0)
 		return ;
-	// Print debug after confirming pipeline will run
-	// ...existing code...
-	if (open_pipes(n, &pipes) < 0)
+	if (setup_pipeline_resources(n, &pipes, &pids) < 0)
 		return ;
-	pids = alloc_pids(n);
-	if (!pids)
-	{
-		free(pipes);
-		return ;
-	}
 	if (fork_children(ast, ctx, n, pipes, pids) < 0)
 	{
 		free(pipes);
