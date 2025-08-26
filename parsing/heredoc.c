@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 18:13:43 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/26 04:16:09 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/26 05:23:03 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -159,7 +159,8 @@ void	process_heredocs(t_ast *head, t_context *ctx)
 	t_ast	*node;
 	t_redir	*r;
 
-	g_signal = 0;
+g_signal = 0;
+ctx->heredoc_interrupted = 0; // Reset flag at start
 	node = head;
 	while (node && g_signal != SIGINT)
 	{
