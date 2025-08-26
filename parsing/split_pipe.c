@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 18:12:16 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/23 18:12:19 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/26 12:26:26 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,7 @@ char	**split_on_pipe(const char *line)
 			if (count + 1 >= cap)
 			{
 				char **new_parts;
-				new_parts = realloc(parts, sizeof(*parts) * cap * 2);
+				new_parts = ft_realloc(parts, sizeof(*parts) * cap, sizeof(*parts) * cap * 2);
 				if (!new_parts)
 				{
 					free_split(parts);

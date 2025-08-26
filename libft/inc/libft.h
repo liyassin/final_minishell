@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 17:16:29 by anassih           #+#    #+#             */
-/*   Updated: 2025/05/01 18:32:25 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/26 12:23:58 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,5 +77,6 @@ char				*ft_substr(char const *s, unsigned int start, size_t len);
 char				*ft_strtok(char *str, const char *delim);
 int					ft_tolower(int c);
 int					ft_toupper(int c);
+void				*ft_realloc(void *ptr, size_t old_size, size_t new_size);
 
 #endif
