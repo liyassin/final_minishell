@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 18:23:05 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/26 07:57:03 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/26 09:36:39 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,10 +58,11 @@ int	builtin_pwd(t_context *ctx)
 
 int	builtin_echo(char **args, t_context *ctx)
 {
-	int	i;
-	int	newline;
-	int	escape;
-	int	j;
+	int i;
+	int newline;
+	int escape;
+	int j;
+	(void)ctx;
 
 	i = 1;
 	newline = 1;
@@ -116,6 +117,6 @@ int	builtin_echo(char **args, t_context *ctx)
 	}
 	if (newline)
 		write(1, "\n", 1);
-	ctx->exit_status = 0;
+	// Do not reset exit_status on success; retain previous value
 	return (0);
 }

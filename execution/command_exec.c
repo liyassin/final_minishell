@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 18:17:02 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/25 05:31:57 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/26 09:58:53 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,14 +81,26 @@ void	exec_command(t_ast *ast, t_context *ctx)
 	if (!ast || !ctx)
 		return ;
 	skip_empty_command_args(ast);
-	if (!ast->command || ast->command[0] == '\0')
-	{
-		if (handle_redirection(ast) == 0)
-			ctx->exit_status = 0;
-		else
-			ctx->exit_status = 1;
-		return ;
-	}
+	   if (!ast->command || ast->command[0] == '\0')
+	   {
+			   // Ignore truly empty commands: just redraw prompt, do not print error or exit
+			   int has_heredoc = 0;
+			   t_redir *redir = ast->redirs;
+			   while (redir)
+			   {
+					   if (redir->type == REDIR_HEREDOC)
+					   {
+							   has_heredoc = 1;
+							   break;
+					   }
+					   redir = redir->next;
+			   }
+			   if (!(ctx->exit_status == 130 || g_signal == SIGINT) && !has_heredoc && ast->args && ast->args[0] && ast->args[0][0] != '\0') {
+					   handle_command_not_found(ast->command);
+					   ctx->exit_status = 127;
+			   }
+			   return ;
+	   }
 	pid = fork();
 	if (pid == 0)
 	{

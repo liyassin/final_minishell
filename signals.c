@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 16:41:57 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/25 04:14:46 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/26 09:36:39 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@ volatile sig_atomic_t g_signal = 0;
 
 void	handle_sigint(int sig)
 {
+	g_signal = SIGINT;
 	(void)sig;
 	write(STDOUT_FILENO, "\n", 1);
 	rl_replace_line("", 0);

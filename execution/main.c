@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 18:16:18 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/26 07:57:03 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/26 09:58:54 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,8 @@ int	main(int argc, char **argv, char **envp)
 	{
 		g_signal = 0;
 		input = read_input(&should_exit, &ctx);
+		if (g_signal == SIGINT)
+			ctx.exit_status = 130;
 		if (!input)
 			continue ;
 		head = build_ast_pipeline(input, &ctx);

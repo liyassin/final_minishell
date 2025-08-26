@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 18:13:43 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/26 06:55:40 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/26 09:58:48 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,7 @@ static void	heredoc_child_process(t_redir *r, t_context *ctx)
 	sigemptyset(&sa.sa_mask);
 	sa.sa_flags = 0;
 	sigaction(SIGINT, &sa, NULL);
+	signal(SIGQUIT, SIG_IGN);
 	while (1)
 	{
 		line = readline("> ");
@@ -161,21 +162,22 @@ void	process_heredocs(t_ast *head, t_context *ctx)
 g_signal = 0;
 ctx->heredoc_interrupted = 0; // Reset flag at start
 	node = head;
-	while (node && g_signal != SIGINT)
+	   while (node)
 	{
 		r = node->redirs;
-		while (r && g_signal != SIGINT)
+			   while (r)
 		{
-			if (r->type == REDIR_HEREDOC)
-			{
-				read_heredoc(r, ctx);
-				if (ctx->exit_status == 130 || g_signal == SIGINT)
-				{
-					close_remaining_heredocs(head);
-					setup_shell_signals();
-					return ;
-				}
-			}
+					   if (r->type == REDIR_HEREDOC)
+					   {
+							   read_heredoc(r, ctx);
+							   if (ctx->exit_status == 130 || g_signal == SIGINT)
+							   {
+									   // Heredoc interrupted or finished: just return to prompt, do not exit shell
+									   close_remaining_heredocs(head);
+									   setup_shell_signals();
+									   return ;
+							   }
+					   }
 			r = r->next;
 		}
 		node = node->next;
