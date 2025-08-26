@@ -44,6 +44,7 @@ typedef struct s_context
 	char	**env;
 	int		exit_status;
 	pid_t	main_process_pid;
+	int		heredoc_interrupted;
 }	t_context;
 
 // Builtins

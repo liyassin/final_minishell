@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 18:13:43 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/25 04:40:45 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/26 04:16:09 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,6 +127,7 @@ void	read_heredoc(t_redir *r, t_context *ctx)
 			r->heredoc_fd[0] = -1;
 			r->heredoc_fd[1] = -1;
 			ctx->exit_status = 130;
+			ctx->heredoc_interrupted = 1;
 			g_signal = SIGINT;
 		}
 		else if (g_signal == SIGINT)
@@ -136,6 +137,7 @@ void	read_heredoc(t_redir *r, t_context *ctx)
 			r->heredoc_fd[0] = -1;
 			r->heredoc_fd[1] = -1;
 			ctx->exit_status = 130;
+			ctx->heredoc_interrupted = 1;
 		}
 		else
 		{

@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 18:14:09 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/25 00:07:30 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/26 04:30:11 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -150,7 +150,10 @@ t_ast	*tokenize_input(const char *input, t_context *ctx)
 
 	tokens = smart_split(input);
 	if (!tokens)
+	{
+		ctx->exit_status = 2;
 		return (NULL);
+	}
 	ast = alloc_ast(tokens);
 	if (!ast)
 		return (free_split(tokens), (t_ast *) NULL);

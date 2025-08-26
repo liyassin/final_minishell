@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 18:14:19 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/23 18:14:33 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/26 04:30:14 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ static t_ast	*build_pipeline_list(char **segments, t_context *ctx)
 		if (!node)
 		{
 			free_ast(head);
-			ctx->exit_status = 1;
+			ctx->exit_status = 2; // Syntax error exit code
 			return (NULL);
 		}
 		if (!head)
