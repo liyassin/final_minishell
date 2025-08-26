@@ -1,6 +1,0 @@
-$ [minishell] > cat "$USER'$USER'"
-$ [minishell] > /bin/rm -f "$USER'$USER'"
-$ [minishell] > exit
-$ [minishell] > cat "$USER'$USER'"
-$ [minishell] > /bin/rm -f "$USER'$USER'"
-$ [minishell] > exit
