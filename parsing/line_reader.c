@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 18:13:13 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/27 05:09:10 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/27 06:54:03 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,18 +19,45 @@ static int	line_needs_continuation(char *input, size_t len)
 		return (0);
 	if (input[len - 1] == '|')
 		return (1);
-	if (len >= 2 && (!ft_strncmp(input + len - 2, "||", 2) 
-		|| !ft_strncmp(input + len - 2, "&&", 2)))
+	if (len >= 2 && (!ft_strncmp(input + len - 2, "||", 2)
+			|| !ft_strncmp(input + len - 2, "&&", 2)))
 		return (1);
 	return (0);
 }
 
+static char	*handle_line_continuation(char *input, t_context *ctx)
+{
+	char	*more;
+	char	*tmp;
+	size_t	len;
+
+	len = ft_strlen(input);
+	while (line_needs_continuation(input, len))
+	{
+		more = readline("> ");
+		if (g_signal == SIGINT)
+		{
+			free(input);
+			if (more)
+				free(more);
+			ctx->exit_status = 130;
+			return (NULL);
+		}
+		if (!more)
+			break ;
+		tmp = ft_strjoin(input, more);
+		free(input);
+		free(more);
+		input = tmp;
+		len = ft_strlen(input);
+	}
+	return (input);
+}
+
 char	*read_input(int *should_exit, t_context *ctx)
 {
-	char    *input;
-	char    *trimmed;
-	char    *more;
-	size_t  len;
+	char	*input;
+	char	*trimmed;
 
 	input = readline("$ [minishell] > ");
 	if (!input)
@@ -48,27 +75,9 @@ char	*read_input(int *should_exit, t_context *ctx)
 		return (NULL);
 	}
 	free(trimmed);
-	// PS2 prompt: keep reading if line ends with |, ||, or &&
-	len = ft_strlen(input);
-	while (line_needs_continuation(input, len))
-	{
-		more = readline("> ");
-		if (g_signal == SIGINT)
-		{
-			free(input);
-			if (more)
-				free(more);
-			ctx->exit_status = 130;
-			return NULL;
-		}
-		if (!more)
-			break;
-		char *tmp = ft_strjoin(input, more);
-		free(input);
-		free(more);
-		input = tmp;
-		len = ft_strlen(input);
-	}
+	input = handle_line_continuation(input, ctx);
+	if (!input)
+		return (NULL);
 	if (*input)
 		add_history(input);
 	return (input);

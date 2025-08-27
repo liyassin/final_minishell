@@ -6,16 +6,16 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/29 18:20:29 by anassih           #+#    #+#             */
-/*   Updated: 2025/04/29 18:21:46 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/27 07:03:06 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../inc/libft.h"
 
-char    *ft_strtok(char *str, const char *delim)
+char	*ft_strtok(char *str, const char *delim)
 {
-	static char *backup;
-	char        *token;
+	static char	*backup;
+	char		*token;
 
 	if (str != NULL)
 		backup = str;

@@ -6,31 +6,12 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/27 05:30:00 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/27 05:38:25 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/27 06:54:03 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 #include "../includes/signals.h"
-
-static int	is_numeric_arg(char *arg)
-{
-	int	i;
-
-	if (arg[0] == '+' || arg[0] == '-')
-		i = 1;
-	else
-		i = 0;
-	if (!arg[i])
-		return (0);
-	while (arg[i])
-	{
-		if (!ft_isdigit((unsigned char)arg[i]))
-			return (0);
-		i++;
-	}
-	return (1);
-}
 
 static void	handle_child_exit(char **args, t_context *ctx)
 {
@@ -60,18 +41,11 @@ static void	handle_child_exit(char **args, t_context *ctx)
 	exit(ctx->exit_status);
 }
 
-static void	child_exec(t_ast *ast, t_context *ctx)
+static void	handle_child_builtin(t_ast *ast, t_context *ctx)
 {
 	t_builtin	type;
 	int			status;
-	char		*path;
 
-	reset_default_signals();
-	if (handle_redirection(ast) < 0)
-	{
-		ctx->exit_status = 1;
-		exit(ctx->exit_status);
-	}
 	type = get_builtin_type(ast->args[0]);
 	if (type != NOT_BUILTIN)
 	{
@@ -81,6 +55,19 @@ static void	child_exec(t_ast *ast, t_context *ctx)
 		ctx->exit_status = status;
 		exit(ctx->exit_status);
 	}
+}
+
+static void	child_exec(t_ast *ast, t_context *ctx)
+{
+	char	*path;
+
+	reset_default_signals();
+	if (handle_redirection(ast) < 0)
+	{
+		ctx->exit_status = 1;
+		exit(ctx->exit_status);
+	}
+	handle_child_builtin(ast, ctx);
 	path = find_command_path(ast->command, ctx);
 	if (!path)
 		handle_command_not_found(ast->command);

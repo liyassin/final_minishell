@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 18:14:19 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/27 00:37:48 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/27 06:54:03 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,7 +81,7 @@ t_ast	*build_ast_pipeline(char *input, t_context *ctx)
 	if (!validate_pipeline_start(trimmed, ctx, input))
 		return (NULL);
 	free(trimmed);
-	segments = split_on_pipe(input);
+	segments = split_by_pipes(input);
 	free(input);
 	if (!segments)
 		return (NULL);

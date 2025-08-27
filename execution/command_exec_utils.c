@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/15 15:30:00 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/27 05:09:10 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/27 06:54:03 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,5 +60,24 @@ int	is_arg_empty_str(char **args)
 		i++;
 	if (args[0][i] != '\0')
 		return (0);
+	return (1);
+}
+
+int	is_numeric_arg(char *arg)
+{
+	int	i;
+
+	if (arg[0] == '+' || arg[0] == '-')
+		i = 1;
+	else
+		i = 0;
+	if (!arg[i])
+		return (0);
+	while (arg[i])
+	{
+		if (!ft_isdigit(arg[i]))
+			return (0);
+		i++;
+	}
 	return (1);
 }

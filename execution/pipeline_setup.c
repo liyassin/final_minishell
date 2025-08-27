@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 18:15:04 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/23 18:15:20 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/27 07:23:44 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ int	open_pipes(int n, int (**pipes)[2])
 	int	(*p)[2];
 	int	i;
 
-	p = ft_calloc(n - 1, sizeof(int[2]));
+	p = ft_calloc(n - 1, sizeof (int [2]));
 	if (!p)
 		return (perror("minishell: malloc"), -1);
 	i = 0;

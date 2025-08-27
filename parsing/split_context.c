@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 18:12:30 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/27 00:37:48 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/27 06:54:03 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,8 @@ void	flush_token(t_split_ctx *ctx)
 
 int	process_ws_op(char c, t_split_ctx *ctx, const char *input, size_t *i)
 {
+	t_token_ctx	token_ctx;
+
 	if (ctx->state == STATE_NORMAL && ft_isspace((unsigned char)c))
 	{
 		if (ctx->cur)
@@ -43,8 +45,6 @@ int	process_ws_op(char c, t_split_ctx *ctx, const char *input, size_t *i)
 	}
 	if (ctx->state == STATE_NORMAL && (c == '>' || c == '<' || c == '|'))
 	{
-		t_token_ctx	token_ctx;
-
 		if (ctx->cur)
 			flush_token(ctx);
 		token_ctx.tokens = &ctx->tokens;

@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 21:35:01 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/27 06:15:16 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/27 07:17:33 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,7 @@ typedef enum e_builtin
 	CHILD_BUILTIN
 }	t_builtin;
 
-extern volatile sig_atomic_t		g_signal;
+extern volatile sig_atomic_t	g_signal;
 
 typedef struct s_context
 {
@@ -68,13 +68,31 @@ void		exec_command(t_ast *ast, t_context *ctx);
 void		execute_pipeline(t_ast *ast, t_context *ctx);
 t_ast		*build_ast_pipeline(char *input, t_context *ctx);
 
-char		**split_on_pipe(const char *line);
+char		**split_by_pipes(const char *line);
 char		*join_free(char *s1, char *s2);
 char		*join_free_const(char *s1, const char *s2);
 void		free_ast(t_ast *ast);
 char		*read_input(int *should_exit, t_context *ctx);
 void		handle_command_not_found(char *cmd);
 void		execute_if_needed(t_ast *head, t_context *ctx, int *should_exit);
+
+// heredoc functions
+void		read_heredoc(t_redir *r, t_context *ctx);
+void		process_heredocs(t_ast *head, t_context *ctx);
+void		write_heredoc_line(t_redir *r, char *line, t_context *ctx);
+void		close_remaining_heredocs(t_ast *head);
+void		handle_interrupted_heredoc(t_redir *r, t_context *ctx);
+void		handle_successful_heredoc(t_redir *r);
+
+// pipeline executor utils
+void		wait_pipeline(int n, pid_t *pids, t_context *ctx);
+
+// substitution utility functions
+int			setup_substitution_pipe(int pipefd[2]);
+char		*read_subcmd_output(int pipefd[2]);
+char		*assemble_substitution(const char *input, const char *buf,
+				char *open, char *end);
+
 int			count_pipeline(t_ast *ast);
 int			open_pipes(int n, int (**pipes)[2]);
 pid_t		*alloc_pids(int n);
@@ -87,7 +105,7 @@ void		handle_directory_redirection_error(t_redir *r, t_context *ctx);
 void		consume_stdin_and_discard(void);
 void		handle_empty_head(t_ast *head, t_context *ctx);
 void		handle_redirection_only(t_ast *head, t_context *ctx);
-int	setup_pipeline_resources(int n, int (**pipes)[2], pid_t **pids);
+int			setup_pipeline_resources(int n, int (**pipes)[2], pid_t **pids);
 
 // command_exec_utils.c
 void		setup_child_signals(void);
@@ -95,6 +113,7 @@ void		handle_exec_failure(char *command, char *full_path, t_context *ctx);
 int			should_search_path(char *command);
 int			has_heredoc_redir(t_ast *ast);
 int			is_arg_empty_str(char **args);
+int			is_numeric_arg(char *arg);
 
 // command_exec_process.c
 void		handle_parent_process(pid_t pid, t_context *ctx);
@@ -103,6 +122,10 @@ void		execute_fork_process(t_ast *ast, t_context *ctx);
 
 // main_utils.c
 void		init_context(t_context *ctx, char **envp);
+
+// heredoc_utils.c
+void		write_heredoc_line(t_redir *r, char *line, t_context *ctx);
+void		close_remaining_heredocs(t_ast *head);
 
 typedef struct s_pipeline_data
 {

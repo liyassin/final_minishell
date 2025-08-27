@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 18:19:33 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/27 00:37:48 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/27 06:54:03 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,24 +51,20 @@ size_t	copy_dollar_seq(const char *in, t_expand_ctx *ctx, char *out,
 	return (1);
 }
 
-// Second pass: build the expanded string.
-void	build_str(const char *in, char **envp, int exit_status, char *out)
+static void	process_expansion_loop(const char *in, t_expand_ctx *ctx, char *out)
 {
-	size_t			i;
-	size_t			pos;
-	size_t			skip;
-	size_t			written;
-	t_expand_ctx	ctx;
+	size_t	i;
+	size_t	pos;
+	size_t	skip;
+	size_t	written;
 
-	ctx.envp = envp;
-	ctx.exit_status = exit_status;
 	i = 0;
 	pos = 0;
 	while (in[i])
 	{
 		if (in[i] == '$')
 		{
-			written = copy_dollar_seq(in + i, &ctx, out + pos, &skip);
+			written = copy_dollar_seq(in + i, ctx, out + pos, &skip);
 			pos += written;
 			i += skip;
 		}
@@ -78,6 +74,16 @@ void	build_str(const char *in, char **envp, int exit_status, char *out)
 		}
 	}
 	out[pos] = '\0';
+}
+
+// Second pass: build the expanded string.
+void	build_str(const char *in, char **envp, int exit_status, char *out)
+{
+	t_expand_ctx	ctx;
+
+	ctx.envp = envp;
+	ctx.exit_status = exit_status;
+	process_expansion_loop(in, &ctx, out);
 }
 
 char	*expand_env_vars(const char *input, char **envp, int exit_status)

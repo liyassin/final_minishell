@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 18:15:30 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/27 05:38:25 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/27 07:05:36 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,58 +52,43 @@ static t_ast	*get_nth_node(t_ast *ast, int n)
 	return (cur);
 }
 
-static int	fork_children(t_ast *ast, t_context *ctx, t_pipeline_data *data)
+static int	fork_single_child(t_ast *ast, t_context *ctx,
+		t_pipeline_data *data, int i)
 {
 	t_ast	*cur;
-	int		i;
 
-	i = data->n - 1;
-	while (i >= 0)
+	cur = get_nth_node(ast, i);
+	if (!cur)
+		return (-1);
+	data->pids[i] = fork();
+	if (data->pids[i] == 0)
 	{
-		cur = get_nth_node(ast, i);
-		if (!cur)
-			return (-1);
-		data->pids[i] = fork();
-		if (data->pids[i] == 0)
-		{
-			reset_default_signals();
-			setup_pipes(i, data->n, data->pipes);
-			close_pipes(data->n, data->pipes);
-			exec_node(cur, ctx);
-		}
-		else if (data->pids[i] < 0)
-		{
-			ctx->exit_status = 1;
-			perror("minishell: fork");
-			return (-1);
-		}
-		i--;
+		reset_default_signals();
+		setup_pipes(i, data->n, data->pipes);
+		close_pipes(data->n, data->pipes);
+		exec_node(cur, ctx);
+	}
+	else if (data->pids[i] < 0)
+	{
+		ctx->exit_status = 1;
+		perror("minishell: fork");
+		return (-1);
 	}
 	return (0);
 }
 
-// Wait for all children, store only last exit status.
-static void	wait_pipeline(int n, pid_t *pids, t_context *ctx)
+static int	fork_children(t_ast *ast, t_context *ctx, t_pipeline_data *data)
 {
 	int	i;
-	int	status;
 
-	i = 0;
-	while (i < n)
+	i = data->n - 1;
+	while (i >= 0)
 	{
-		if (pids[i] > 0)
-		{
-			waitpid(pids[i], &status, 0);
-			if (i == n - 1)
-			{
-				if (WIFEXITED(status))
-					ctx->exit_status = WEXITSTATUS(status);
-				else if (WIFSIGNALED(status))
-					ctx->exit_status = 128 + WTERMSIG(status);
-			}
-		}
-		i++;
+		if (fork_single_child(ast, ctx, data, i) == -1)
+			return (-1);
+		i--;
 	}
+	return (0);
 }
 
 // Execute an AST pipeline by forking and wiring pipes.
@@ -111,8 +96,8 @@ void	execute_pipeline(t_ast *ast, t_context *ctx)
 {
 	int				n;
 	int				(*pipes)[2];
-	pid_t				*pids;
-	t_pipeline_data			data;
+	pid_t			*pids;
+	t_pipeline_data	data;
 
 	if (!ast || !ctx)
 		return ;

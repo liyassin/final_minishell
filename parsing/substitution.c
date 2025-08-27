@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 18:12:09 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/27 05:09:10 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/27 06:54:03 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,16 +56,12 @@ static void	exec_subcmd(const char *subcmd, t_context *ctx, int pipefd[2])
 // Run the subcommand in a forked child, read its stdout, return it.
 static char	*run_subcmd_and_collect(const char *subcmd, t_context *ctx)
 {
-	int			pipefd[2];
-	pid_t		pid;
-	char		buf[4096];
-	ssize_t		n;
+	int		pipefd[2];
+	pid_t	pid;
+	char	*result;
 
-	if (pipe(pipefd) < 0)
-	{
-		perror("minishell: pipe");
+	if (setup_substitution_pipe(pipefd) < 0)
 		return (ft_strdup(""));
-	}
 	pid = fork();
 	if (pid < 0)
 	{
@@ -76,39 +72,9 @@ static char	*run_subcmd_and_collect(const char *subcmd, t_context *ctx)
 	}
 	if (pid == 0)
 		exec_subcmd(subcmd, ctx, pipefd);
-	close(pipefd[1]);
-	n = read(pipefd[0], buf, sizeof(buf) - 1);
-	close(pipefd[0]);
+	result = read_subcmd_output(pipefd);
 	waitpid(pid, NULL, 0);
-	if (n > 0)
-		buf[n] = '\0';
-	else
-		buf[0] = '\0';
-	return (ft_strdup(buf));
-}
-
-// Assemble "prefix + trimmed(output) + suffix" into the final string.
-static char	*assemble_substitution(const char *input, const char *buf, 
-		char *open, char *end)
-{
-	size_t	prefix_len;
-	char	*prefix;
-	char	*trimmed;
-	char	*suffix;
-	char	*tmp;
-	char	*res;
-
-	prefix_len = open - input - 2;
-	prefix = ft_substr(input, 0, prefix_len);
-	trimmed = ft_strtrim(buf, "\n");
-	suffix = ft_strdup(end + 1);
-	tmp = ft_strjoin(prefix, trimmed);
-	res = ft_strjoin(tmp, suffix);
-	free(prefix);
-	free(trimmed);
-	free(suffix);
-	free(tmp);
-	return (res);
+	return (result);
 }
 
 // Public API: replace first "$(…)" in input with its command output.

@@ -21,14 +21,19 @@ PARSING_SRCS := \
 	parsing/line_reader.c \
 	parsing/smart_split.c \
 	parsing/split_pipe.c \
+	parsing/split_pipe_utils.c \
 	parsing/ast_utils.c \
 	parsing/ast_utils_helpers.c \
 	parsing/ast_utils_syntax.c \
 	parsing/ast_utils_processing.c \
 	parsing/quotes.c \
 	parsing/split_context.c \
+	parsing/split_context_utils.c \
 	parsing/substitution.c \
+	parsing/substitution_utils.c \
 	parsing/heredoc.c \
+	parsing/heredoc_utils.c \
+	parsing/heredoc_utils2.c \
 	parsing/redir_utils.c \
 	parsing/split_helpers.c
 
@@ -46,6 +51,7 @@ EXEC_SRCS := \
 	execution/path_resolver.c \
 	execution/pipeline_setup.c \
 	execution/pipeline_executor.c \
+	execution/pipeline_executor_utils.c \
 	execution/redirections.c
 
 BUILTIN_SRCS := \

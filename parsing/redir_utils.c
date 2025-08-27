@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 18:12:53 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/27 05:09:10 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/27 06:54:03 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,22 @@ char	*remove_all_quotes(const char *str)
 	return (result);
 }
 
+static char	*process_redir_target(char *raw_target, char *stripped,
+		t_redir_type type, t_context *ctx)
+{
+	char	*expanded;
+
+	if (type == REDIR_HEREDOC)
+		return (stripped);
+	if (raw_target[0] != '\'')
+	{
+		expanded = expand_env_vars(stripped, ctx->env, ctx->exit_status);
+		free(stripped);
+		return (expanded);
+	}
+	return (stripped);
+}
+
 // Helper to create redirection nodes
 t_redir	*create_redir_node(t_redir_type type, char *raw_target,
 		t_context *ctx)
@@ -53,28 +69,12 @@ t_redir	*create_redir_node(t_redir_type type, char *raw_target,
 		return (NULL);
 	new->type = type;
 	new->next = NULL;
-	quoted = (ft_strchr(raw_target, '"') != NULL 
-		|| ft_strchr(raw_target, '\'') != NULL);
+	quoted = (ft_strchr(raw_target, '"') != NULL
+			|| ft_strchr(raw_target, '\'') != NULL);
 	stripped = remove_all_quotes(raw_target);
 	if (!stripped)
 		return (free(new), (t_redir *) NULL);
-	if (type == REDIR_HEREDOC)
-	{
-		new->target = stripped;
-	}
-	else
-	{
-		if (raw_target[0] != '\'')
-		{
-			char	*expanded;
-			
-			expanded = expand_env_vars(stripped, ctx->env, ctx->exit_status);
-			free(stripped);
-			new->target = expanded;
-		}
-		else
-			new->target = stripped;
-	}
+	new->target = process_redir_target(raw_target, stripped, type, ctx);
 	if (type == REDIR_HEREDOC)
 	{
 		new->quoted = quoted;

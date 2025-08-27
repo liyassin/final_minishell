@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 21:35:01 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/27 06:01:08 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/27 07:07:05 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,12 +80,26 @@ t_ast	*tokenize_input(const char *input, t_context *ctx);
 char	*process_double_quotes(const char *token, t_context *ctx);
 char	*handle_quotes(char *token, t_context *ctx);
 char	**smart_split(const char *input);
+char	**split_by_pipes(const char *line);
+void	update_quote_state(char c, char *quote);
 char	*handle_command_substitution(char *input, t_context *ctx);
+
+typedef struct s_pipe_context
+{
+	char	**parts;
+	size_t	*count;
+	size_t	*cap;
+}	t_pipe_context;
+
+char	**process_token_loop(const char *line, t_pipe_context *ctx);
+char	**handle_pipe_segment(const char *line, t_pipe_context *ctx,
+			size_t start, size_t i);
 
 void	free_ast(t_ast *ast);
 
 void	init_ctx(t_split_ctx *ctx);
 void	flush_token(t_split_ctx *ctx);
+void	remove_whitespace_only_tokens(t_split_ctx *ctx);
 int		process_ws_op(char c, t_split_ctx *ctx, const char *input, size_t *i);
 void	update_state_and_append(char c, t_split_ctx *ctx);
 void	*ft_realloc(void *ptr, size_t old_size, size_t new_size);
