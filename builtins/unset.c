@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 18:20:01 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/23 18:20:14 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/27 03:45:06 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,10 @@ int	builtin_unset(char **args, t_context *ctx)
 			status = 1;
 		}
 		else
+		{
 			remove_env_var(ctx->env, args[i]);
+			remove_env_var(ctx->exported, args[i]);
+		}
 		i++;
 	}
 	ctx->exit_status = status;

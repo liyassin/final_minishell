@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 18:12:24 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/27 03:35:41 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/27 03:37:22 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,7 +86,6 @@ void	add_token(char ***tokens, size_t *count, size_t *cap, char *token)
 	(*tokens)[*count] = NULL;
 }
 
-// Extract operator string and advance index
 static char	*extract_operator(const char *input, size_t *i)
 {
 	char    op[16];
