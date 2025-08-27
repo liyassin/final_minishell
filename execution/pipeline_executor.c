@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 18:15:30 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/26 23:49:00 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/27 05:38:25 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,25 +107,12 @@ static void	wait_pipeline(int n, pid_t *pids, t_context *ctx)
 }
 
 // Execute an AST pipeline by forking and wiring pipes.
-static int	setup_pipeline_resources(int n, int (**pipes)[2], pid_t **pids)
-{
-	if (open_pipes(n, pipes) < 0)
-		return (-1);
-	*pids = alloc_pids(n);
-	if (!*pids)
-	{
-		free(*pipes);
-		return (-1);
-	}
-	return (0);
-}
-
 void	execute_pipeline(t_ast *ast, t_context *ctx)
 {
-	int		n;
-	int		(*pipes)[2];
-	pid_t		*pids;
-	t_pipeline_data	data;
+	int				n;
+	int				(*pipes)[2];
+	pid_t				*pids;
+	t_pipeline_data			data;
 
 	if (!ast || !ctx)
 		return ;

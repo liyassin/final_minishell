@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 18:12:09 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/26 21:26:32 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/27 05:09:10 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,7 +88,8 @@ static char	*run_subcmd_and_collect(const char *subcmd, t_context *ctx)
 }
 
 // Assemble "prefix + trimmed(output) + suffix" into the final string.
-static char	*assemble_substitution(const char *input, const char *buf, char *open, char *end)
+static char	*assemble_substitution(const char *input, const char *buf, 
+		char *open, char *end)
 {
 	size_t	prefix_len;
 	char	*prefix;

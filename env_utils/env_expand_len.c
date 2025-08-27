@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 18:18:23 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/23 18:18:51 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/27 05:38:25 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,8 @@ size_t	get_exit_len(int code)
 	return (len);
 }
 
-size_t	get_dollar_seq_len(const char *in, char **envp, int exit_status, size_t *skip)
+size_t	get_dollar_seq_len(const char *in, char **envp, int exit_status,
+		size_t *skip)
 {
 	size_t	vlen;
 	char	name[128];

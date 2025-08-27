@@ -1,0 +1,348 @@
+cleanup.c: OK!
+signals.c: OK!
+builtins/cd.c: OK!
+builtins/child_builtins.c: OK!
+builtins/exit.c: OK!
+builtins/export.c: Error!
+Error: TOO_FEW_TAB          (line:  18, col:   1):	Missing tabs for indent level
+Error: TOO_MANY_FUNCS       (line: 131, col:   1):	Too many functions in file
+Error: TOO_MANY_FUNCS       (line: 152, col:   1):	Too many functions in file
+Error: TOO_MANY_FUNCS       (line: 171, col:   1):	Too many functions in file
+builtins/unset.c: OK!
+builtins/utils.c: OK!
+env_utils/env_array.c: OK!
+env_utils/env_expand_build.c: Error!
+Error: TOO_MANY_LINES       (line:  52, col:   1):	Function has more than 25 lines
+env_utils/env_expand_len.c: Error!
+Error: SPC_BEFORE_NL        (line:  55, col:  73):	Space before newline
+env_utils/env_utils.c: OK!
+execution/builtin_dispatch.c: OK!
+execution/builtin_type.c: OK!
+execution/command_errors.c: OK!
+execution/command_exec.c: Error!
+Error: TOO_MANY_FUNCS       (line: 102, col:   1):	Too many functions in file
+Error: TOO_MANY_FUNCS       (line: 130, col:   1):	Too many functions in file
+Error: TOO_MANY_FUNCS       (line: 146, col:   1):	Too many functions in file
+Error: TOO_MANY_FUNCS       (line: 152, col:   1):	Too many functions in file
+Error: TOO_MANY_FUNCS       (line: 169, col:   1):	Too many functions in file
+execution/executor.c: Error!
+Error: ASSIGN_IN_CONTROL    (line:  36, col:  24):	Assignment in control structure
+Error: TOO_MANY_LINES       (line:  83, col:   1):	Function has more than 25 lines
+execution/main.c: Error!
+Error: TOO_MANY_FUNCS       (line:  85, col:   1):	Too many functions in file
+execution/path_resolver.c: OK!
+execution/pipeline_executor.c: Error!
+Error: TOO_MANY_LINES       (line:  83, col:   1):	Function has more than 25 lines
+Error: TOO_MANY_FUNCS       (line: 123, col:   1):	Too many functions in file
+Error: MISALIGNED_VAR_DECL  (line: 127, col:  17):	Misaligned variable declaration
+Error: MISALIGNED_VAR_DECL  (line: 128, col:  21):	Misaligned variable declaration
+execution/pipeline_setup.c: Error!
+Error: SPACE_AFTER_KW       (line:  38, col:  33):	Missing space after keyword
+Error: SPC_BFR_PAR          (line:  38, col:  36):	Missing space before parenthesis (brace/bracket)
+execution/redirections.c: Error!
+Error: TOO_MANY_LINES       (line:  99, col:   1):	Function has more than 25 lines
+includes/builtins.h: OK!
+includes/cleanup.h: OK!
+includes/env_utils.h: OK!
+includes/minishell.h: Error!
+Notice: GLOBAL_VAR_DETECTED  (line:  48, col:   1):	Global variable present in file. Make sure it is a reasonable choice.
+Error: MISALIGNED_VAR_DECL  (line:  48, col:  37):	Misaligned variable declaration
+includes/signals.h: OK!
+includes/tokenization.h: OK!
+libft/inc/ft_printf.h: OK!
+libft/inc/get_next_line.h: OK!
+libft/inc/libft.h: OK!
+libft/src/ft_realloc.c: OK!
+libft/src/ft_is/ft_isalnum.c: OK!
+libft/src/ft_is/ft_isalpha.c: OK!
+libft/src/ft_is/ft_isascii.c: OK!
+libft/src/ft_is/ft_isdigit.c: OK!
+libft/src/ft_is/ft_islower.c: OK!
+libft/src/ft_is/ft_isprint.c: OK!
+libft/src/ft_is/ft_isspace.c: OK!
+libft/src/ft_is/ft_isupper.c: OK!
+libft/src/ft_lst/ft_lstadd_back.c: OK!
+libft/src/ft_lst/ft_lstadd_front.c: OK!
+libft/src/ft_lst/ft_lstclear.c: OK!
+libft/src/ft_lst/ft_lstdelone.c: OK!
+libft/src/ft_lst/ft_lstiter.c: OK!
+libft/src/ft_lst/ft_lstlast.c: OK!
+libft/src/ft_lst/ft_lstmap.c: OK!
+libft/src/ft_lst/ft_lstnew.c: OK!
+libft/src/ft_lst/ft_lstsize.c: OK!
+libft/src/ft_mem/ft_bzero.c: OK!
+libft/src/ft_mem/ft_calloc.c: OK!
+libft/src/ft_mem/ft_memchr.c: OK!
+libft/src/ft_mem/ft_memcmp.c: OK!
+libft/src/ft_mem/ft_memcpy.c: OK!
+libft/src/ft_mem/ft_memmove.c: OK!
+libft/src/ft_mem/ft_memset.c: OK!
+libft/src/ft_mem/ft_realloc.c: Error!
+Error: RETURN_PARENTHESIS   (line:  24, col:  16):	Return value must be in parenthesis
+Error: RETURN_PARENTHESIS   (line:  28, col:  16):	Return value must be in parenthesis
+Error: WRONG_SCOPE_VAR      (line:  31, col:   1):	Variable declared in incorrect scope
+Error: SPACE_REPLACE_TAB    (line:  31, col:  15):	Found space when expecting tab
+Error: DECL_ASSIGN_LINE     (line:  31, col:  26):	Declaration and assignation on a single line
+Error: TERNARY_FBIDDEN      (line:  31, col:  48):	Ternaries are forbidden
+Error: RETURN_PARENTHESIS   (line:  35, col:  12):	Return value must be in parenthesis
+libft/src/ft_printf/ft_handle_char.c: OK!
+libft/src/ft_printf/ft_handle_hex.c: OK!
+libft/src/ft_printf/ft_handle_int.c: OK!
+libft/src/ft_printf/ft_handle_percent.c: OK!
+libft/src/ft_printf/ft_handle_pointer.c: OK!
+libft/src/ft_printf/ft_handle_string.c: OK!
+libft/src/ft_printf/ft_handle_unsigned.c: OK!
+libft/src/ft_printf/ft_printf.c: OK!
+libft/src/ft_printf/ft_printf_utils.c: OK!
+libft/src/ft_put/ft_putchar_fd.c: OK!
+libft/src/ft_put/ft_putendl_fd.c: OK!
+libft/src/ft_put/ft_putnbr_fd.c: OK!
+libft/src/ft_put/ft_putstr_fd.c: OK!
+libft/src/ft_str/ft_split.c: OK!
+libft/src/ft_str/ft_strchr.c: OK!
+libft/src/ft_str/ft_strcmp.c: OK!
+libft/src/ft_str/ft_strdup.c: OK!
+libft/src/ft_str/ft_striteri.c: OK!
+libft/src/ft_str/ft_strjoin.c: OK!
+libft/src/ft_str/ft_strlcat.c: OK!
+libft/src/ft_str/ft_strlcpy.c: OK!
+libft/src/ft_str/ft_strlen.c: OK!
+libft/src/ft_str/ft_strmapi.c: OK!
+libft/src/ft_str/ft_strncmp.c: OK!
+libft/src/ft_str/ft_strncpy.c: OK!
+libft/src/ft_str/ft_strndup.c: Error!
+Error: TOO_FEW_TAB          (line:  17, col:   1):	Missing tabs for indent level
+Error: SPACE_REPLACE_TAB    (line:  17, col:   5):	Found space when expecting tab
+Error: SPACE_EMPTY_LINE     (line:  18, col:   1):	Space on empty line
+Error: TOO_FEW_TAB          (line:  20, col:   1):	Missing tabs for indent level
+Error: SPACE_REPLACE_TAB    (line:  20, col:   5):	Found space when expecting tab
+Error: TOO_FEW_TAB          (line:  22, col:   1):	Missing tabs for indent level
+Error: SPACE_REPLACE_TAB    (line:  22, col:   9):	Found space when expecting tab
+Error: TOO_FEW_TAB          (line:  23, col:   1):	Missing tabs for indent level
+Error: SPACE_REPLACE_TAB    (line:  23, col:   9):	Found space when expecting tab
+Error: TOO_FEW_TAB          (line:  24, col:   1):	Missing tabs for indent level
+Error: SPACE_EMPTY_LINE     (line:  24, col:   5):	Space on empty line
+Error: TOO_FEW_TAB          (line:  25, col:   1):	Missing tabs for indent level
+Error: SPACE_REPLACE_TAB    (line:  25, col:   5):	Found space when expecting tab
+libft/src/ft_str/ft_strnstr.c: OK!
+libft/src/ft_str/ft_strrchr.c: OK!
+libft/src/ft_str/ft_strtok.c: Error!
+Error: CONSECUTIVE_SPC      (line:  15, col:   5):	Two or more consecutives spaces
+Error: SPACE_BEFORE_FUNC    (line:  15, col:   8):	space before function name
+Error: SPACE_REPLACE_TAB    (line:  17, col:  16):	Found space when expecting tab
+Error: CONSECUTIVE_SPC      (line:  18, col:   9):	Two or more consecutives spaces
+Error: SPACE_REPLACE_TAB    (line:  18, col:   9):	Found space when expecting tab
+Error: BRACE_SHOULD_EOL     (line:  39, col:   1):	Expected newline after brace
+libft/src/ft_str/ft_strtrim.c: OK!
+libft/src/ft_str/ft_substr.c: OK!
+libft/src/ft_to/ft_atoi.c: OK!
+libft/src/ft_to/ft_atoi_base.c: OK!
+libft/src/ft_to/ft_atol.c: OK!
+libft/src/ft_to/ft_itoa.c: OK!
+libft/src/ft_to/ft_tolower.c: OK!
+libft/src/ft_to/ft_toupper.c: OK!
+libft/src/get_next_line/get_next_line.c: OK!
+libft/src/get_next_line/gnl_utils.c: OK!
+parsing/ast_builder.c: OK!
+parsing/ast_utils.c: Error!
+Error: TOO_MANY_FUNCS       (line: 102, col:   1):	Too many functions in file
+Error: TOO_MANY_FUNCS       (line: 128, col:   1):	Too many functions in file
+Error: TOO_MANY_FUNCS       (line: 139, col:   1):	Too many functions in file
+Error: TOO_MANY_FUNCS       (line: 154, col:   1):	Too many functions in file
+Error: TOO_MANY_FUNCS       (line: 175, col:   1):	Too many functions in file
+Error: TOO_MANY_FUNCS       (line: 201, col:   1):	Too many functions in file
+Error: TOO_MANY_FUNCS       (line: 229, col:   1):	Too many functions in file
+Error: TOO_MANY_FUNCS       (line: 241, col:   1):	Too many functions in file
+Error: SPC_BEFORE_NL        (line: 250, col:  52):	Space before newline
+Error: SPC_BEFORE_NL        (line: 251, col:  59):	Space before newline
+Error: TOO_MANY_FUNCS       (line: 262, col:   1):	Too many functions in file
+Error: EOL_OPERATOR         (line: 266, col:  69):	Logic operator at the end of line
+Error: TOO_MANY_FUNCS       (line: 278, col:   1):	Too many functions in file
+Error: TOO_MANY_FUNCS       (line: 298, col:   1):	Too many functions in file
+parsing/heredoc.c: Error!
+Notice: GLOBAL_VAR_DETECTED  (line:  16, col:   1):	Global variable present in file. Make sure it is a reasonable choice.
+Error: SPACE_REPLACE_TAB    (line:  16, col:  29):	Found space when expecting tab
+Error: TOO_FEW_TAB          (line:  20, col:   1):	Missing tabs for indent level
+Error: TOO_FEW_TAB          (line:  21, col:   1):	Missing tabs for indent level
+Error: TOO_FEW_TAB          (line:  22, col:   1):	Missing tabs for indent level
+Error: TOO_MANY_LINES       (line: 103, col:   1):	Function has more than 25 lines
+Error: TOO_MANY_FUNCS       (line: 105, col:   1):	Too many functions in file
+Error: TOO_MANY_LINES       (line: 155, col:   1):	Function has more than 25 lines
+Error: TOO_MANY_FUNCS       (line: 157, col:   1):	Too many functions in file
+Error: TOO_FEW_TAB          (line: 162, col:   1):	Missing tabs for indent level
+Error: TOO_FEW_TAB          (line: 163, col:   1):	Missing tabs for indent level
+Error: TOO_FEW_TAB          (line: 163, col:   1):	Missing tabs for indent level
+Error: WRONG_SCOPE_COMMENT  (line: 163, col:  31):	Comment is invalid in this scope
+Error: WRONG_SCOPE_COMMENT  (line: 163, col:  31):	Comment is invalid in this scope
+Error: MIXED_SPACE_TAB      (line: 165, col:   1):	Mixed spaces and tabs
+Error: CONSECUTIVE_SPC      (line: 165, col:   5):	Two or more consecutives spaces
+Error: TOO_MANY_TAB         (line: 168, col:   1):	Extra tabs for indent level
+Error: MIXED_SPACE_TAB      (line: 168, col:   9):	Mixed spaces and tabs
+Error: CONSECUTIVE_SPC      (line: 168, col:  13):	Two or more consecutives spaces
+Error: TOO_MANY_TAB         (line: 170, col:   1):	Extra tabs for indent level
+Error: MIXED_SPACE_TAB      (line: 170, col:  17):	Mixed spaces and tabs
+Error: CONSECUTIVE_SPC      (line: 170, col:  21):	Two or more consecutives spaces
+Error: TOO_MANY_TAB         (line: 171, col:   1):	Extra tabs for indent level
+Error: MIXED_SPACE_TAB      (line: 171, col:  17):	Mixed spaces and tabs
+Error: CONSECUTIVE_SPC      (line: 171, col:  21):	Two or more consecutives spaces
+Error: TOO_MANY_TAB         (line: 172, col:   1):	Extra tabs for indent level
+Error: MIXED_SPACE_TAB      (line: 172, col:  25):	Mixed spaces and tabs
+Error: CONSECUTIVE_SPC      (line: 172, col:  29):	Two or more consecutives spaces
+Error: TOO_MANY_TAB         (line: 173, col:   1):	Extra tabs for indent level
+Error: MIXED_SPACE_TAB      (line: 173, col:  25):	Mixed spaces and tabs
+Error: CONSECUTIVE_SPC      (line: 173, col:  29):	Two or more consecutives spaces
+Error: LINE_TOO_LONG        (line: 173, col:  82):	line too long
+Error: TOO_MANY_TAB         (line: 174, col:   1):	Extra tabs for indent level
+Error: MIXED_SPACE_TAB      (line: 174, col:  25):	Mixed spaces and tabs
+Error: CONSECUTIVE_SPC      (line: 174, col:  29):	Two or more consecutives spaces
+Error: TOO_MANY_TAB         (line: 175, col:   1):	Extra tabs for indent level
+Error: MIXED_SPACE_TAB      (line: 175, col:  33):	Mixed spaces and tabs
+Error: CONSECUTIVE_SPC      (line: 175, col:  37):	Two or more consecutives spaces
+Error: TOO_MANY_TAB         (line: 176, col:   1):	Extra tabs for indent level
+Error: MIXED_SPACE_TAB      (line: 176, col:  33):	Mixed spaces and tabs
+Error: CONSECUTIVE_SPC      (line: 176, col:  37):	Two or more consecutives spaces
+Error: TOO_MANY_TAB         (line: 177, col:   1):	Extra tabs for indent level
+Error: MIXED_SPACE_TAB      (line: 177, col:  33):	Mixed spaces and tabs
+Error: CONSECUTIVE_SPC      (line: 177, col:  37):	Two or more consecutives spaces
+Error: TOO_MANY_TAB         (line: 178, col:   1):	Extra tabs for indent level
+Error: MIXED_SPACE_TAB      (line: 178, col:  25):	Mixed spaces and tabs
+Error: CONSECUTIVE_SPC      (line: 178, col:  29):	Two or more consecutives spaces
+Error: TOO_MANY_TAB         (line: 179, col:   1):	Extra tabs for indent level
+Error: MIXED_SPACE_TAB      (line: 179, col:  17):	Mixed spaces and tabs
+Error: CONSECUTIVE_SPC      (line: 179, col:  21):	Two or more consecutives spaces
+Error: TOO_MANY_LINES       (line: 185, col:   1):	Function has more than 25 lines
+parsing/line_reader.c: Error!
+Error: SPC_BEFORE_NL        (line:  22, col:  59):	Space before newline
+Error: TOO_FEW_TAB          (line:  23, col:   9):	Missing tabs for indent level
+Error: CONSECUTIVE_SPC      (line:  30, col:   9):	Two or more consecutives spaces
+Error: SPACE_REPLACE_TAB    (line:  30, col:   9):	Found space when expecting tab
+Error: CONSECUTIVE_SPC      (line:  31, col:   9):	Two or more consecutives spaces
+Error: SPACE_REPLACE_TAB    (line:  31, col:   9):	Found space when expecting tab
+Error: CONSECUTIVE_SPC      (line:  32, col:   9):	Two or more consecutives spaces
+Error: SPACE_REPLACE_TAB    (line:  32, col:   9):	Found space when expecting tab
+Error: CONSECUTIVE_SPC      (line:  33, col:  11):	Two or more consecutives spaces
+Error: SPACE_REPLACE_TAB    (line:  33, col:  11):	Found space when expecting tab
+Error: WRONG_SCOPE_COMMENT  (line:  51, col:   5):	Comment is invalid in this scope
+Error: RETURN_PARENTHESIS   (line:  62, col:  20):	Return value must be in parenthesis
+Error: SPACE_AFTER_KW       (line:  65, col:  13):	Missing space after keyword
+Error: WRONG_SCOPE_VAR      (line:  66, col:   1):	Variable declared in incorrect scope
+Error: SPACE_REPLACE_TAB    (line:  66, col:  13):	Found space when expecting tab
+Error: DECL_ASSIGN_LINE     (line:  66, col:  19):	Declaration and assignation on a single line
+Error: TOO_MANY_LINES       (line:  75, col:   1):	Function has more than 25 lines
+parsing/quotes.c: OK!
+parsing/redir_utils.c: Error!
+Error: SPC_BEFORE_NL        (line:  56, col:  49):	Space before newline
+Error: TOO_FEW_TAB          (line:  57, col:   1):	Missing tabs for indent level
+Error: WRONG_SCOPE_VAR      (line:  69, col:   1):	Variable declared in incorrect scope
+Error: SPACE_EMPTY_LINE     (line:  70, col:   1):	Space on empty line
+Error: TOO_MANY_LINES       (line:  85, col:   1):	Function has more than 25 lines
+parsing/smart_split.c: Error!
+Error: MIXED_SPACE_TAB      (line:  39, col:   1):	Mixed spaces and tabs
+Error: CONSECUTIVE_SPC      (line:  39, col:   5):	Two or more consecutives spaces
+Error: TOO_MANY_TAB         (line:  40, col:   1):	Extra tabs for indent level
+Error: MIXED_SPACE_TAB      (line:  40, col:   9):	Mixed spaces and tabs
+Error: CONSECUTIVE_SPC      (line:  40, col:  13):	Two or more consecutives spaces
+Error: MIXED_SPACE_TAB      (line:  41, col:   1):	Mixed spaces and tabs
+Error: CONSECUTIVE_SPC      (line:  41, col:   5):	Two or more consecutives spaces
+Error: WRONG_SCOPE_COMMENT  (line:  41, col:   8):	Comment is invalid in this scope
+Error: MIXED_SPACE_TAB      (line:  42, col:   1):	Mixed spaces and tabs
+Error: VAR_DECL_START_FUNC  (line:  42, col:   1):	Variable declaration not at start of function
+Error: CONSECUTIVE_SPC      (line:  42, col:   5):	Two or more consecutives spaces
+Error: MIXED_SPACE_TAB      (line:  43, col:   1):	Mixed spaces and tabs
+Error: VAR_DECL_START_FUNC  (line:  43, col:   1):	Variable declaration not at start of function
+Error: CONSECUTIVE_SPC      (line:  43, col:   5):	Two or more consecutives spaces
+Error: MIXED_SPACE_TAB      (line:  44, col:   1):	Mixed spaces and tabs
+Error: TOO_MANY_VARS_FUNC   (line:  44, col:   1):	Too many variables declarations in a function
+Error: VAR_DECL_START_FUNC  (line:  44, col:   1):	Variable declaration not at start of function
+Error: CONSECUTIVE_SPC      (line:  44, col:   5):	Two or more consecutives spaces
+Error: MIXED_SPACE_TAB      (line:  45, col:   1):	Mixed spaces and tabs
+Error: TOO_MANY_VARS_FUNC   (line:  45, col:   1):	Too many variables declarations in a function
+Error: VAR_DECL_START_FUNC  (line:  45, col:   1):	Variable declaration not at start of function
+Error: CONSECUTIVE_SPC      (line:  45, col:   5):	Two or more consecutives spaces
+Error: MISALIGNED_VAR_DECL  (line:  45, col:  13):	Misaligned variable declaration
+Error: MIXED_SPACE_TAB      (line:  47, col:   1):	Mixed spaces and tabs
+Error: CONSECUTIVE_SPC      (line:  47, col:   5):	Two or more consecutives spaces
+Error: MIXED_SPACE_TAB      (line:  48, col:   1):	Mixed spaces and tabs
+Error: CONSECUTIVE_SPC      (line:  48, col:   5):	Two or more consecutives spaces
+Error: MIXED_SPACE_TAB      (line:  49, col:   1):	Mixed spaces and tabs
+Error: CONSECUTIVE_SPC      (line:  49, col:   5):	Two or more consecutives spaces
+Error: MIXED_SPACE_TAB      (line:  50, col:   1):	Mixed spaces and tabs
+Error: TOO_FEW_TAB          (line:  50, col:   1):	Missing tabs for indent level
+Error: CONSECUTIVE_SPC      (line:  50, col:   5):	Two or more consecutives spaces
+Error: TOO_MANY_TAB         (line:  51, col:   1):	Extra tabs for indent level
+Error: MIXED_SPACE_TAB      (line:  51, col:   9):	Mixed spaces and tabs
+Error: CONSECUTIVE_SPC      (line:  51, col:  13):	Two or more consecutives spaces
+Error: TOO_MANY_TAB         (line:  52, col:   1):	Extra tabs for indent level
+Error: MIXED_SPACE_TAB      (line:  52, col:   9):	Mixed spaces and tabs
+Error: CONSECUTIVE_SPC      (line:  52, col:  13):	Two or more consecutives spaces
+Error: TOO_MANY_TAB         (line:  53, col:   1):	Extra tabs for indent level
+Error: MIXED_SPACE_TAB      (line:  53, col:   9):	Mixed spaces and tabs
+Error: CONSECUTIVE_SPC      (line:  53, col:  13):	Two or more consecutives spaces
+Error: TOO_MANY_TAB         (line:  54, col:   1):	Extra tabs for indent level
+Error: MIXED_SPACE_TAB      (line:  54, col:  17):	Mixed spaces and tabs
+Error: CONSECUTIVE_SPC      (line:  54, col:  21):	Two or more consecutives spaces
+Error: TOO_MANY_TAB         (line:  55, col:   1):	Extra tabs for indent level
+Error: MIXED_SPACE_TAB      (line:  55, col:   9):	Mixed spaces and tabs
+Error: CONSECUTIVE_SPC      (line:  55, col:  13):	Two or more consecutives spaces
+Error: MIXED_SPACE_TAB      (line:  56, col:   9):	Mixed spaces and tabs
+Error: CONSECUTIVE_SPC      (line:  56, col:  13):	Two or more consecutives spaces
+Error: TOO_MANY_TAB         (line:  57, col:   1):	Extra tabs for indent level
+Error: MIXED_SPACE_TAB      (line:  57, col:  17):	Mixed spaces and tabs
+Error: CONSECUTIVE_SPC      (line:  57, col:  21):	Two or more consecutives spaces
+Error: TOO_MANY_TAB         (line:  58, col:   1):	Extra tabs for indent level
+Error: MIXED_SPACE_TAB      (line:  58, col:  17):	Mixed spaces and tabs
+Error: CONSECUTIVE_SPC      (line:  58, col:  21):	Two or more consecutives spaces
+Error: MIXED_SPACE_TAB      (line:  59, col:   9):	Mixed spaces and tabs
+Error: CONSECUTIVE_SPC      (line:  59, col:  13):	Two or more consecutives spaces
+Error: TOO_MANY_TAB         (line:  60, col:   1):	Extra tabs for indent level
+Error: MIXED_SPACE_TAB      (line:  60, col:   9):	Mixed spaces and tabs
+Error: CONSECUTIVE_SPC      (line:  60, col:  13):	Two or more consecutives spaces
+Error: MIXED_SPACE_TAB      (line:  61, col:   9):	Mixed spaces and tabs
+Error: CONSECUTIVE_SPC      (line:  61, col:  13):	Two or more consecutives spaces
+Error: TOO_MANY_TAB         (line:  62, col:   1):	Extra tabs for indent level
+Error: MIXED_SPACE_TAB      (line:  62, col:  17):	Mixed spaces and tabs
+Error: CONSECUTIVE_SPC      (line:  62, col:  21):	Two or more consecutives spaces
+Error: TOO_MANY_TAB         (line:  63, col:   1):	Extra tabs for indent level
+Error: MIXED_SPACE_TAB      (line:  63, col:  17):	Mixed spaces and tabs
+Error: CONSECUTIVE_SPC      (line:  63, col:  21):	Two or more consecutives spaces
+Error: MIXED_SPACE_TAB      (line:  64, col:   9):	Mixed spaces and tabs
+Error: CONSECUTIVE_SPC      (line:  64, col:  13):	Two or more consecutives spaces
+Error: TOO_MANY_TAB         (line:  65, col:   1):	Extra tabs for indent level
+Error: MIXED_SPACE_TAB      (line:  65, col:   9):	Mixed spaces and tabs
+Error: CONSECUTIVE_SPC      (line:  65, col:  13):	Two or more consecutives spaces
+Error: MIXED_SPACE_TAB      (line:  66, col:   1):	Mixed spaces and tabs
+Error: TOO_FEW_TAB          (line:  66, col:   1):	Missing tabs for indent level
+Error: CONSECUTIVE_SPC      (line:  66, col:   5):	Two or more consecutives spaces
+Error: MIXED_SPACE_TAB      (line:  67, col:   1):	Mixed spaces and tabs
+Error: CONSECUTIVE_SPC      (line:  67, col:   5):	Two or more consecutives spaces
+Error: TOO_MANY_TAB         (line:  68, col:   1):	Extra tabs for indent level
+Error: MIXED_SPACE_TAB      (line:  68, col:   9):	Mixed spaces and tabs
+Error: CONSECUTIVE_SPC      (line:  68, col:  13):	Two or more consecutives spaces
+Error: MIXED_SPACE_TAB      (line:  69, col:   1):	Mixed spaces and tabs
+Error: CONSECUTIVE_SPC      (line:  69, col:   5):	Two or more consecutives spaces
+Error: TOO_MANY_LINES       (line:  70, col:   1):	Function has more than 25 lines
+parsing/split_context.c: Error!
+Error: WRONG_SCOPE_VAR      (line:  46, col:   1):	Variable declared in incorrect scope
+parsing/split_helpers.c: Error!
+Error: CONSECUTIVE_SPC      (line:  91, col:   9):	Two or more consecutives spaces
+Error: SPACE_REPLACE_TAB    (line:  91, col:   9):	Found space when expecting tab
+Error: CONSECUTIVE_SPC      (line:  92, col:  11):	Two or more consecutives spaces
+Error: SPACE_REPLACE_TAB    (line:  92, col:  11):	Found space when expecting tab
+Error: CONSECUTIVE_SPC      (line:  93, col:  11):	Two or more consecutives spaces
+Error: SPACE_REPLACE_TAB    (line:  93, col:  11):	Found space when expecting tab
+Error: WRONG_SCOPE_VAR      (line:  99, col:   1):	Variable declared in incorrect scope
+Error: SPACE_REPLACE_TAB    (line:  99, col:  13):	Found space when expecting tab
+Error: DECL_ASSIGN_LINE     (line:  99, col:  16):	Declaration and assignation on a single line
+parsing/split_pipe.c: Error!
+Error: TOO_MANY_VARS_FUNC   (line:  41, col:   1):	Too many variables declarations in a function
+Error: TOO_MANY_VARS_FUNC   (line:  42, col:   1):	Too many variables declarations in a function
+Error: WRONG_SCOPE_VAR      (line:  64, col:   1):	Variable declared in incorrect scope
+Error: SPACE_REPLACE_TAB    (line:  64, col:  21):	Found space when expecting tab
+Error: SPC_BEFORE_NL        (line:  65, col:  68):	Space before newline
+Error: TOO_FEW_TAB          (line:  66, col:   1):	Missing tabs for indent level
+Error: TOO_MANY_LINES       (line:  81, col:   1):	Function has more than 25 lines
+parsing/substitution.c: Error!
+Error: TOO_MANY_LINES       (line:  88, col:   1):	Function has more than 25 lines
+Error: SPC_BEFORE_NL        (line:  91, col:  71):	Space before newline
+Error: TOO_MANY_VARS_FUNC   (line:  99, col:   1):	Too many variables declarations in a function
+Error: TOO_MANY_FUNCS       (line: 115, col:   1):	Too many functions in file

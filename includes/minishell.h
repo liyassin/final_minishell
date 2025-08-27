@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 21:35:01 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/26 23:49:00 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/27 06:15:16 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,12 +17,13 @@
 # include <dirent.h>
 # include <errno.h>
 # include <fcntl.h>
-# include <../libft/inc/libft.h>
+# include <libft.h>
 # include <limits.h>
 # include <readline/history.h>
 # include <readline/readline.h>
 # include <signal.h>
 # include <stdbool.h>
+# include <stdio.h>
 # include <stdlib.h>
 # include <string.h>
 # include <sys/stat.h>
@@ -80,6 +81,28 @@ pid_t		*alloc_pids(int n);
 void		setup_pipes(int i, int n, int pipes[][2]);
 void		close_pipes(int n, int pipes[][2]);
 void		cleanup_shell(t_ast *ast, t_context *ctx);
+
+// executor_utils.c
+void		handle_directory_redirection_error(t_redir *r, t_context *ctx);
+void		consume_stdin_and_discard(void);
+void		handle_empty_head(t_ast *head, t_context *ctx);
+void		handle_redirection_only(t_ast *head, t_context *ctx);
+int	setup_pipeline_resources(int n, int (**pipes)[2], pid_t **pids);
+
+// command_exec_utils.c
+void		setup_child_signals(void);
+void		handle_exec_failure(char *command, char *full_path, t_context *ctx);
+int			should_search_path(char *command);
+int			has_heredoc_redir(t_ast *ast);
+int			is_arg_empty_str(char **args);
+
+// command_exec_process.c
+void		handle_parent_process(pid_t pid, t_context *ctx);
+void		handle_fork_error(t_context *ctx);
+void		execute_fork_process(t_ast *ast, t_context *ctx);
+
+// main_utils.c
+void		init_context(t_context *ctx, char **envp);
 
 typedef struct s_pipeline_data
 {

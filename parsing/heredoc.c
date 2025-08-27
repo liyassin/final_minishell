@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 18:13:43 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/26 21:26:26 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/27 06:15:16 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -159,25 +159,24 @@ void	process_heredocs(t_ast *head, t_context *ctx)
 	t_ast	*node;
 	t_redir	*r;
 
-g_signal = 0;
-ctx->heredoc_interrupted = 0; // Reset flag at start
+	g_signal = 0;
+	ctx->heredoc_interrupted = 0;
 	node = head;
-	   while (node)
+	while (node)
 	{
 		r = node->redirs;
-			   while (r)
+		while (r)
 		{
-					   if (r->type == REDIR_HEREDOC)
-					   {
-							   read_heredoc(r, ctx);
-							   if (ctx->exit_status == 130 || g_signal == SIGINT)
-							   {
-									   // Heredoc interrupted or finished: just return to prompt, do not exit shell
-									   close_remaining_heredocs(head);
-									   setup_shell_signals();
-									   return ;
-							   }
-					   }
+			if (r->type == REDIR_HEREDOC)
+			{
+				read_heredoc(r, ctx);
+				if (ctx->exit_status == 130 || g_signal == SIGINT)
+				{
+					close_remaining_heredocs(head);
+					setup_shell_signals();
+					return ;
+				}
+			}
 			r = r->next;
 		}
 		node = node->next;

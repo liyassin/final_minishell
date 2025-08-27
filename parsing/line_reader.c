@@ -6,12 +6,24 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 18:13:13 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/27 03:43:55 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/27 05:09:10 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 #include "../includes/signals.h"
+
+static int	line_needs_continuation(char *input, size_t len)
+{
+	if (len < 1)
+		return (0);
+	if (input[len - 1] == '|')
+		return (1);
+	if (len >= 2 && (!ft_strncmp(input + len - 2, "||", 2) 
+		|| !ft_strncmp(input + len - 2, "&&", 2)))
+		return (1);
+	return (0);
+}
 
 char	*read_input(int *should_exit, t_context *ctx)
 {
@@ -38,7 +50,7 @@ char	*read_input(int *should_exit, t_context *ctx)
 	free(trimmed);
 	// PS2 prompt: keep reading if line ends with |, ||, or &&
 	len = ft_strlen(input);
-	while (len > 0 && ( (len >= 2 && (!ft_strncmp(input + len - 2, "||", 2) || !ft_strncmp(input + len - 2, "&&", 2))) || input[len - 1] == '|'))
+	while (line_needs_continuation(input, len))
 	{
 		more = readline("> ");
 		if (g_signal == SIGINT)

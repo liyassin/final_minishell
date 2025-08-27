@@ -22,6 +22,9 @@ PARSING_SRCS := \
 	parsing/smart_split.c \
 	parsing/split_pipe.c \
 	parsing/ast_utils.c \
+	parsing/ast_utils_helpers.c \
+	parsing/ast_utils_syntax.c \
+	parsing/ast_utils_processing.c \
 	parsing/quotes.c \
 	parsing/split_context.c \
 	parsing/substitution.c \
@@ -33,9 +36,13 @@ EXEC_SRCS := \
 	execution/builtin_type.c \
 	execution/builtin_dispatch.c \
 	execution/command_exec.c \
+	execution/command_exec_utils.c \
+	execution/command_exec_process.c \
 	execution/command_errors.c \
 	execution/executor.c \
+	execution/executor_utils.c \
 	execution/main.c \
+	execution/main_utils.c \
 	execution/path_resolver.c \
 	execution/pipeline_setup.c \
 	execution/pipeline_executor.c \
@@ -46,6 +53,7 @@ BUILTIN_SRCS := \
 	builtins/exit.c \
 	builtins/child_builtins.c \
 	builtins/export.c \
+	builtins/export_utils.c \
 	builtins/unset.c \
 	builtins/utils.c
 

@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 16:37:57 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/23 18:22:34 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/27 05:38:25 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ int	builtin_exit(char **args, t_context *ctx)
 		if (!exit_is_numeric(args[1]))
 			return (exit_numeric_error(args[1], ctx));
 		code = ft_atoi(args[1]);
+		ctx->exit_status = (int)code;
 	}
-	ctx->exit_status = (int)code;
 	return (255);
 }

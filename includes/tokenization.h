@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 21:35:01 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/27 00:37:48 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/27 06:01:08 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,11 +92,31 @@ void	*ft_realloc(void *ptr, size_t old_size, size_t new_size);
 char	*append_char(char *str, char c, size_t *len, size_t *cap);
 void	add_token(char ***tokens, size_t *count, size_t *cap, char *token);
 void	handle_operator(const char *input, size_t *i, t_token_ctx *ctx);
-char	*trim_segment(const char *line, size_t start, size_t end);t_ast	*alloc_ast(char **tokens);
+char	*trim_segment(const char *line, size_t start, size_t end);
+t_ast	*alloc_ast(char **tokens);
 void	fill_redirections(t_ast *ast, char **tokens, t_context *ctx);
 int		fill_args(t_ast *ast, char **tokens, t_context *ctx);
 t_ast	*tokenize_input(const char *input, t_context *ctx);
 t_redir	*create_redir_node(t_redir_type type, char *raw_target, t_context *ctx);
 void	process_heredocs(t_ast *head, t_context *ctx);
+
+int		syntax_error_near_token(char *token);
+int		is_operator(char *token);
+int		validate_pipe_syntax(char **tokens, int i);
+int		validate_redirection_syntax(char **tokens, int i);
+int		check_pipe_start(char **tokens, t_context *ctx);
+int		is_triple_pipe_error(char **tokens, int i, t_context *ctx);
+int		is_invalid_redir_token(char **tokens, int i, t_context *ctx);
+void	add_redir_to_list(t_redir ***tail, t_redir_type type, char *target,
+			t_context *ctx);
+int		process_redirection_token(t_redir ***tail, char **tokens, int i,
+			t_context *ctx);
+int		skip_redirection_tokens(char **tokens, int i);
+char	*extract_first_command_word(char *str);
+int		set_command_if_first_arg(t_ast *ast, char *tok, char *expanded,
+			int quoted);
+int		process_argument_token(t_ast *ast, char *tok, int arg_i,
+			t_context *ctx);
+int		validate_syntax(char **tokens, t_context *ctx);
 
 #endif
