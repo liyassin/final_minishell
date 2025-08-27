@@ -210,35 +210,506 @@ final_minishell/
 
 ## 🔧 Implementation Details
 
-### Parsing Engine
+## 🧠 Parsing & AST Architecture
 
-The parsing system follows a multi-stage approach:
+The parsing system is the brain of our shell, transforming raw user input into an executable Abstract Syntax Tree (AST). Think of it as a sophisticated translator that understands shell grammar and converts human commands into a structured format the computer can execute efficiently.
 
-1. **Line Reading**: Interactive input with readline integration
-2. **Tokenization**: Breaking input into logical tokens
-3. **Quote Handling**: Processing single and double quotes
-4. **Variable Expansion**: Expanding environment variables
-5. **AST Construction**: Building an Abstract Syntax Tree
+### 🔄 Parsing Flow Overview
 
-```c
-// Example of the parsing flow
-char *line = readline("minishell$ ");
-if (has_syntax_errors(line))
-    return (syntax_error(line));
+```mermaid
+graph TD
+    A[Raw Input: 'ls -la | grep .c > output.txt'] --> B[Line Reader]
+    B --> C[Syntax Validation]
+    C --> D[Smart Tokenization]
+    D --> E[Quote Processing]
+    E --> F[Variable Expansion]
+    F --> G[AST Construction]
+    G --> H[Command Tree]
     
-t_token *tokens = tokenize(line);
-t_ast *ast = build_ast(tokens);
-execute_ast(ast);
+    subgraph "Tokenization Details"
+        I[Split by Pipes]
+        J[Parse Redirections]
+        K[Handle Quotes]
+        L[Expand Variables]
+    end
+    
+    subgraph "AST Structure"
+        M[Pipeline Node]
+        N[Command Node 1: ls -la]
+        O[Command Node 2: grep .c]
+        P[Redirection Node: > output.txt]
+    end
+    
+    D --> I
+    I --> J
+    J --> K
+    K --> L
+    
+    H --> M
+    M --> N
+    M --> O
+    M --> P
+    
+    style A fill:#e1f5fe
+    style H fill:#c8e6c9
+    style M fill:#fff3e0
 ```
 
-### Execution Engine
+### 📚 The Parsing Journey: A Step-by-Step Analogy
 
-The execution engine handles different command types:
+Imagine you're a librarian organizing a complex research request. A patron asks: *"Find all C files, show their details, filter for recent ones, and save the list to my notebook."*
 
-- **Simple Commands**: Single command execution
-- **Pipelines**: Multi-command chains with pipes
-- **Built-ins**: Internal shell commands
-- **Redirections**: File I/O redirection
+#### Phase 1: **Line Reader** - The Receptionist
+```c
+// The welcoming interface that receives and validates input
+char *line = readline("minishell$ ");
+if (!line)
+    return (handle_eof());
+if (has_unmatched_quotes(line))
+    return (syntax_error("unmatched quotes"));
+```
+
+**Analogy**: Like a receptionist who greets visitors, checks if their request makes sense, and ensures they've filled out forms correctly before passing them to specialists.
+
+#### Phase 2: **Smart Tokenization** - The Request Analyzer
+```mermaid
+graph LR
+    A["ls -la | grep .c > output.txt"] --> B[Smart Split]
+    B --> C["['ls', '-la']"]
+    B --> D["['grep', '.c']"]  
+    B --> E["['>', 'output.txt']"]
+    
+    F[Context Awareness] --> B
+    G[Quote Preservation] --> B
+    H[Pipe Detection] --> B
+    
+    style A fill:#ffebee
+    style C fill:#e8f5e8
+    style D fill:#e8f5e8
+    style E fill:#fff3e0
+```
+
+**The Magic**: Our tokenizer isn't just splitting by spaces—it's understanding context:
+
+```c
+// Example: 'echo "hello world" | grep "hello"'
+// Traditional split: ['echo', '"hello', 'world"', '|', 'grep', '"hello"']
+// Smart split: ['echo', 'hello world', '|', 'grep', 'hello']
+
+t_token *smart_tokenize(char *input)
+{
+    t_context ctx = init_context();
+    while (*input)
+    {
+        if (in_quotes(&ctx, *input))
+            handle_quoted_content(&ctx, &input);
+        else if (is_special_char(*input))
+            handle_operator(&ctx, &input);
+        else
+            handle_regular_content(&ctx, &input);
+    }
+    return (ctx.tokens);
+}
+```
+
+**Analogy**: Like a skilled translator who understands that "New York" is one city, not two words, even when processing a travel itinerary.
+
+#### Phase 3: **AST Construction** - The Master Organizer
+```mermaid
+graph TD
+    A[Input: ls -la | grep .c > output.txt] --> B[Parse Pipeline]
+    
+    B --> C[Pipeline Root]
+    C --> D[Left Command: ls -la]
+    C --> E[Right Side: grep .c > output.txt]
+    
+    E --> F[Command: grep .c]
+    E --> G[Redirection: > output.txt]
+    
+    D --> H[Program: ls]
+    D --> I[Args: -la]
+    
+    F --> J[Program: grep]
+    F --> K[Args: .c]
+    
+    G --> L[Type: OUTPUT]
+    G --> M[File: output.txt]
+    
+    style C fill:#e3f2fd
+    style D fill:#e8f5e8
+    style E fill:#fff3e0
+    style F fill:#e8f5e8
+    style G fill:#ffebee
+```
+
+**The AST Structure**: Think of the AST as a family tree for commands:
+
+```c
+typedef struct s_ast_node
+{
+    t_node_type     type;           // COMMAND, PIPELINE, REDIRECTION
+    char            **args;         // Command arguments
+    char            *program;       // Program to execute
+    struct s_ast_node *left;        // Left child (first command in pipe)
+    struct s_ast_node *right;       // Right child (second command in pipe)
+    t_redirection   *redirections;  // List of redirections
+}   t_ast_node;
+
+// Example AST for: echo "hello" | grep hello > output.txt
+//
+//           PIPELINE
+//          /        \
+//    COMMAND         PIPELINE  
+//   (echo hello)    /        \
+//              COMMAND    REDIRECTION
+//             (grep hello) (> output.txt)
+```
+
+**Analogy**: Like creating a project management chart where each task has dependencies, resources, and outputs clearly mapped out.
+
+### 🔍 Advanced Parsing Features
+
+#### Quote Processing Intelligence
+```c
+// Handles complex quoting scenarios
+char *input = "echo 'He said \"Hello $USER\"' > 'my file.txt'";
+
+// Our parser understands:
+// - Single quotes preserve everything literally
+// - Double quotes allow variable expansion
+// - Nested quotes are handled correctly
+// - Spaces in filenames are preserved
+```
+
+#### Variable Expansion Engine
+```mermaid
+graph TD
+    A["echo $USER-$PWD"] --> B[Identify Variables]
+    B --> C[Lookup $USER → 'anassih']
+    B --> D[Lookup $PWD → '/home/anassih']
+    C --> E[Build Result]
+    D --> E
+    E --> F["echo anassih-/home/anassih"]
+    
+    style A fill:#ffebee
+    style F fill:#e8f5e8
+```
+
+#### Heredoc Processing
+```c
+// Advanced heredoc handling
+// Input: cat << "EOF"
+//        This is $USER's file
+//        Line 2
+//        EOF
+
+t_heredoc *process_heredoc(char *delimiter, bool expand_vars)
+{
+    t_heredoc *heredoc = init_heredoc(delimiter);
+    
+    while (true)
+    {
+        char *line = readline("> ");
+        if (ft_strcmp(line, delimiter) == 0)
+            break;
+        if (expand_vars)
+            line = expand_variables(line);
+        add_line_to_heredoc(heredoc, line);
+    }
+    return (heredoc);
+}
+```
+
+## ⚡ Execution Architecture
+
+The execution engine is the powerhouse of our shell—a sophisticated orchestrator that brings the AST to life. Think of it as a conductor leading a symphony orchestra, where each musician (process) must play their part in perfect harmony.
+
+### 🎭 Execution Flow Overview
+
+```mermaid
+graph TD
+    A[AST Input] --> B{Node Type Analysis}
+    
+    B -->|COMMAND| C[Simple Command Executor]
+    B -->|PIPELINE| D[Pipeline Orchestrator]
+    B -->|BUILTIN| E[Built-in Handler]
+    
+    C --> F[Path Resolution]
+    F --> G[Process Creation]
+    G --> H[Command Execution]
+    
+    D --> I[Multi-Process Setup]
+    I --> J[Pipe Creation]
+    J --> K[Process Chain]
+    K --> L[Synchronization]
+    
+    E --> M[Direct Execution]
+    
+    subgraph "Process Management"
+        N[Fork Management]
+        O[File Descriptor Setup]
+        P[Signal Handling]
+        Q[Exit Code Collection]
+    end
+    
+    H --> N
+    K --> N
+    N --> O
+    O --> P
+    P --> Q
+    
+    style A fill:#e1f5fe
+    style C fill:#e8f5e8
+    style D fill:#fff3e0
+    style E fill:#ffebee
+    style Q fill:#c8e6c9
+```
+
+### 🎼 The Execution Symphony: A Musical Analogy
+
+Imagine conducting an orchestra where each musician represents a process, pipes are the acoustic channels between sections, and you must ensure perfect timing and harmony.
+
+#### Movement 1: **Command Analysis** - Reading the Score
+```c
+int execute_ast(t_ast_node *node, t_shell *shell)
+{
+    if (!node)
+        return (0);
+        
+    // Like a conductor analyzing the musical score
+    switch (node->type)
+    {
+        case NODE_COMMAND:
+            return (execute_simple_command(node, shell));
+        case NODE_PIPELINE:
+            return (execute_pipeline(node, shell));
+        case NODE_BUILTIN:
+            return (execute_builtin(node, shell));
+        default:
+            return (1);
+    }
+}
+```
+
+**Analogy**: Like a conductor who first studies the score, understanding which instruments play when, and how they should coordinate.
+
+#### Movement 2: **Simple Command Execution** - Solo Performance
+```mermaid
+graph TD
+    A[Command: 'ls -la /home'] --> B[Path Resolution]
+    B --> C{Is it built-in?}
+    C -->|Yes| D[Execute Built-in]
+    C -->|No| E[Find in PATH]
+    
+    E --> F[/bin/ls found]
+    F --> G[Fork Process]
+    G --> H[Setup Environment]
+    H --> I[Handle Redirections]
+    I --> J[execve('/bin/ls', args, env)]
+    
+    J --> K[Parent Waits]
+    K --> L[Collect Exit Status]
+    
+    style A fill:#e1f5fe
+    style D fill:#ffebee
+    style J fill:#e8f5e8
+    style L fill:#c8e6c9
+```
+
+```c
+// The solo performance - executing a single command
+int execute_simple_command(t_ast_node *node, t_shell *shell)
+{
+    char *path;
+    pid_t pid;
+    int status;
+    
+    // Find the program (like finding the right instrument)
+    path = resolve_command_path(node->program, shell->env);
+    if (!path)
+        return (command_not_found_error(node->program));
+    
+    // Create a new process (like calling a musician to stage)
+    pid = fork();
+    if (pid == 0)
+    {
+        // Child process - the performer
+        setup_redirections(node->redirections);
+        setup_signals_for_child();
+        execve(path, node->args, shell->env);
+        exit(EXIT_FAILURE);
+    }
+    
+    // Parent process - the conductor waiting
+    waitpid(pid, &status, 0);
+    return (WEXITSTATUS(status));
+}
+```
+
+**Analogy**: Like a solo violin performance where the conductor ensures the violinist has the right sheet music, proper lighting, and waits for them to finish their piece.
+
+#### Movement 3: **Pipeline Execution** - Orchestra Ensemble
+```mermaid
+graph TD
+    A["Pipeline: ls -la | grep .c | wc -l"] --> B[Parse Pipeline Components]
+    
+    B --> C[Command 1: ls -la]
+    B --> D[Command 2: grep .c]  
+    B --> E[Command 3: wc -l]
+    
+    F[Create Pipes] --> G[pipe1: ls → grep]
+    F --> H[pipe2: grep → wc]
+    
+    I[Process Creation] --> J[Fork Process 1]
+    I --> K[Fork Process 2]
+    I --> L[Fork Process 3]
+    
+    M[File Descriptor Setup] --> N[Connect stdout to pipe1]
+    M --> O[Connect stdin from pipe1, stdout to pipe2]
+    M --> P[Connect stdin from pipe2]
+    
+    Q[Synchronization] --> R[Wait for all processes]
+    R --> S[Collect exit codes]
+    
+    style A fill:#e1f5fe
+    style F fill:#fff3e0
+    style I fill:#e8f5e8
+    style Q fill:#c8e6c9
+```
+
+**The Pipeline Magic**: Like connecting instruments with acoustic tubes so the output of one flows seamlessly into the next:
+
+```c
+int execute_pipeline(t_ast_node *pipeline, t_shell *shell)
+{
+    t_command *commands = extract_commands(pipeline);
+    int cmd_count = count_commands(commands);
+    int pipes[cmd_count - 1][2];
+    pid_t pids[cmd_count];
+    
+    // Create all pipes (acoustic channels between musicians)
+    for (int i = 0; i < cmd_count - 1; i++)
+        pipe(pipes[i]);
+    
+    // Create and setup each process (call each musician)
+    for (int i = 0; i < cmd_count; i++)
+    {
+        pids[i] = fork();
+        if (pids[i] == 0)
+        {
+            setup_pipe_connections(i, pipes, cmd_count);
+            close_unused_pipes(pipes, cmd_count - 1);
+            execute_command_in_pipeline(commands[i], shell);
+        }
+    }
+    
+    // Conductor cleanup: close pipes and wait for everyone
+    close_all_pipes(pipes, cmd_count - 1);
+    return (wait_for_pipeline_completion(pids, cmd_count));
+}
+```
+
+#### Movement 4: **Built-in Execution** - Conductor's Direct Action
+```c
+// Built-ins are like the conductor's direct actions
+int execute_builtin(t_ast_node *node, t_shell *shell)
+{
+    char *cmd = node->program;
+    
+    // The conductor handles these directly, no musicians needed
+    if (ft_strcmp(cmd, "cd") == 0)
+        return (builtin_cd(node->args, shell));
+    else if (ft_strcmp(cmd, "export") == 0)
+        return (builtin_export(node->args, shell));
+    else if (ft_strcmp(cmd, "exit") == 0)
+        return (builtin_exit(node->args, shell));
+    // ... other built-ins
+}
+```
+
+**Analogy**: Like when a conductor doesn't need musicians for certain actions—adjusting the tempo, signaling dynamics, or ending the performance—they handle it directly.
+
+### 🔧 Advanced Execution Features
+
+#### Redirection Mastery
+```mermaid
+graph TD
+    A[Input: 'cat < input.txt > output.txt 2> error.log'] --> B[Parse Redirections]
+    
+    B --> C[stdin < input.txt]
+    B --> D[stdout > output.txt]
+    B --> E[stderr 2> error.log]
+    
+    F[File Descriptor Setup] --> G[fd[0] → input.txt]
+    F --> H[fd[1] → output.txt]  
+    F --> I[fd[2] → error.log]
+    
+    J[Execute Command] --> K[Command reads from input.txt]
+    K --> L[Command writes to output.txt]
+    K --> M[Errors go to error.log]
+    
+    style A fill:#e1f5fe
+    style F fill:#fff3e0
+    style J fill:#e8f5e8
+```
+
+#### Signal Handling Strategy
+```c
+// Like having emergency protocols during a performance
+void setup_signal_handling(void)
+{
+    signal(SIGINT, handle_sigint);    // Ctrl+C - stop current piece
+    signal(SIGQUIT, SIG_IGN);         // Ctrl+\ - ignore in shell
+    signal(SIGTERM, handle_sigterm);  // Graceful shutdown
+}
+
+void handle_sigint(int sig)
+{
+    (void)sig;
+    write(STDOUT_FILENO, "\n", 1);
+    rl_on_new_line();
+    rl_replace_line("", 0);
+    rl_redisplay();
+    g_signal_received = SIGINT;
+}
+```
+
+#### Error Code Precision
+```c
+// Like having specific feedback for each type of performance issue
+int handle_command_error(char *cmd, int error_type)
+{
+    switch (error_type)
+    {
+        case ENOENT:    // 127: Command not found
+            ft_putstr_fd("minishell: ", STDERR_FILENO);
+            ft_putstr_fd(cmd, STDERR_FILENO);
+            ft_putendl_fd(": command not found", STDERR_FILENO);
+            return (127);
+            
+        case EACCES:    // 126: Permission denied
+            ft_putstr_fd("minishell: ", STDERR_FILENO);
+            ft_putstr_fd(cmd, STDERR_FILENO);
+            ft_putendl_fd(": permission denied", STDERR_FILENO);
+            return (126);
+            
+        default:
+            return (1);
+    }
+}
+```
+
+### 🎯 Execution Performance Features
+
+- **Lazy Evaluation**: Commands are only prepared when needed
+- **Efficient Piping**: Minimal memory usage for large data streams  
+- **Process Pooling**: Reuse of process patterns for similar commands
+- **Smart Waiting**: Non-blocking waits where possible
+- **Resource Cleanup**: Automatic cleanup of file descriptors and processes
+
+**Analogy**: Like a world-class conductor who knows exactly when to cue each section, how to balance the sound, and how to recover gracefully from any mistakes—all while making it look effortless to the audience.
+
+## 🔄 Additional Implementation Details
 
 ### Memory Management
 
