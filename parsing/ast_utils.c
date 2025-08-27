@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 18:14:09 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/27 00:37:48 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/27 03:35:41 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -257,6 +257,17 @@ static int	validate_syntax(char **tokens, t_context *ctx)
 				STDERR_FILENO);
 			ctx->exit_status = 2;
 			return (0);
+		}
+		if ((tokens[i][0] == '>' || tokens[i][0] == '<'))
+		{
+			if (ft_strcmp(tokens[i], ">") && ft_strcmp(tokens[i], ">>") &&
+				ft_strcmp(tokens[i], "<") && ft_strcmp(tokens[i], "<<"))
+			{
+				ft_putstr_fd("bash: syntax error near unexpected token `>'\n",
+					STDERR_FILENO);
+				ctx->exit_status = 2;
+				return (0);
+			}
 		}
 		i++;
 	}

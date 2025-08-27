@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 18:16:18 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/26 23:27:24 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/27 03:19:27 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 static void	init_context(t_context *ctx, char **envp)
 {
 	ctx->env = copy_environment(envp);
-	ctx->exported = NULL;
+	ctx->exported = copy_environment(envp);
 	ctx->exit_status = 0;
 	ctx->ast_head = NULL;
 	ctx->heredoc_interrupted = 0;

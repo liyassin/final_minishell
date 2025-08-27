@@ -1,0 +1,16 @@
+>
+builtins
+cleanup.c
+d
+env_utils
+execution
+includes
+libft
+Makefile
+minishell
+minishell.supp
+obj
+parsing
+readline.supp
+signals.c
+valgrind.log

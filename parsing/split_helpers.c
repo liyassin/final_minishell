@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 18:12:24 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/27 00:37:48 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/27 03:35:41 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,18 +89,23 @@ void	add_token(char ***tokens, size_t *count, size_t *cap, char *token)
 // Extract operator string and advance index
 static char	*extract_operator(const char *input, size_t *i)
 {
-	char	op[3];
+	char    op[16];
+	size_t  start;
+	size_t  len;
 
+	start = *i;
+	len = 0;
+	if (input[*i] == '>' || input[*i] == '<')
+	{
+		char c = input[*i];
+		while (input[*i + len] == c && len < 15)
+			len++;
+		ft_strlcpy(op, input + start, len + 1);
+		*i += len - 1;
+		return (ft_strdup(op));
+	}
 	op[0] = input[*i];
 	op[1] = '\0';
-	op[2] = '\0';
-	if ((input[*i] == '>' && input[*i + 1] == '>')
-		|| (input[*i] == '<' && input[*i + 1] == '<'))
-	{
-		op[1] = input[*i];
-		op[2] = '\0';
-		(*i)++;
-	}
 	return (ft_strdup(op));
 }
 

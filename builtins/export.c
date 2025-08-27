@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 16:38:10 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/26 23:40:30 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/27 03:08:47 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,8 +69,11 @@ static int	find_existing_export(char **exported, const char *name,
 		if (!ft_strncmp(exported[i], name, name_len)
 			&& (exported[i][name_len] == '=' || exported[i][name_len] == '\0'))
 		{
-			free(exported[i]);
-			exported[i] = ft_strdup(arg);
+			if (ft_strchr(arg, '='))
+			{
+				free(exported[i]);
+				exported[i] = ft_strdup(arg);
+			}
 			return (1);
 		}
 		i++;
