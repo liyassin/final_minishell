@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 18:16:00 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/26 23:27:24 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/28 00:18:27 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,8 +36,16 @@ static char	*try_path_candidate(char *dir, char *cmd)
 	cand = join_free_const(path, cmd);
 	if (!cand)
 		return (NULL);
-	if (access(cand, X_OK) == 0)
-		return (cand);
+	if (access(cand, F_OK) == 0)
+	{
+		if (access(cand, X_OK) == 0)
+			return (cand);
+		else
+		{
+			free(cand);
+			return ((char *)-1);
+		}
+	}
 	free(cand);
 	return (NULL);
 }

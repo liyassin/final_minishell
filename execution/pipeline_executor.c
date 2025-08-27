@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 18:15:30 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/27 07:05:36 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/28 00:18:27 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,13 @@ static void	exec_node(t_ast *node, t_context *ctx)
 	path = find_command_path(node->command, ctx);
 	if (!path)
 		handle_command_not_found(node->command);
+	if (path == (char *)-1)
+	{
+		ft_putstr_fd("minishell: ", STDERR_FILENO);
+		ft_putstr_fd(node->command, STDERR_FILENO);
+		ft_putstr_fd(": Permission denied\n", STDERR_FILENO);
+		exit(126);
+	}
 	execve(path, node->args, ctx->env);
 	perror("minishell");
 	free(path);

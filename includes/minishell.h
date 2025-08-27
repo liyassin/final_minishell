@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 21:35:01 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/27 07:42:13 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/28 00:22:49 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,6 +72,9 @@ char		*join_free(char *s1, char *s2);
 char		*join_free_const(char *s1, const char *s2);
 void		free_ast(t_ast *ast);
 char		*read_input(int *should_exit, t_context *ctx);
+char		*handle_eof(int *should_exit);
+char		*handle_empty_input(char *input, char *trimmed, t_context *ctx);
+char		*handle_quote_error(char *input, t_context *ctx);
 void		handle_command_not_found(char *cmd);
 void		execute_if_needed(t_ast *head, t_context *ctx, int *should_exit);
 

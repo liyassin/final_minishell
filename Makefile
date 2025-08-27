@@ -19,6 +19,7 @@ LDLIBS      := -lreadline -lcurses $(LIBFT_LIB)
 PARSING_SRCS := \
 	parsing/ast_builder.c \
 	parsing/line_reader.c \
+	parsing/line_reader_utils.c \
 	parsing/smart_split.c \
 	parsing/split_pipe.c \
 	parsing/split_pipe_utils.c \

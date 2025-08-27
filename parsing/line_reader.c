@@ -6,12 +6,30 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 18:13:13 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/27 09:07:00 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/28 00:22:49 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 #include "../includes/signals.h"
+
+static int	has_unclosed_quotes(char *input)
+{
+	char	quote;
+	int		i;
+
+	quote = 0;
+	i = 0;
+	while (input[i])
+	{
+		if ((input[i] == '"' || input[i] == '\'') && !quote)
+			quote = input[i];
+		else if (input[i] == quote)
+			quote = 0;
+		i++;
+	}
+	return (quote != 0);
+}
 
 static int	line_needs_continuation(char *input, size_t len)
 {
@@ -61,20 +79,13 @@ char	*read_input(int *should_exit, t_context *ctx)
 
 	input = readline("$ [minishell] > ");
 	if (!input)
-	{
-		ft_putendl_fd("exit", STDOUT_FILENO);
-		*should_exit = 1;
-		return (NULL);
-	}
+		return (handle_eof(should_exit));
 	trimmed = ft_strtrim(input, " ");
 	if (!trimmed || !*trimmed)
-	{
-		free(input);
-		free(trimmed);
-		ctx->exit_status = 0;
-		return (NULL);
-	}
+		return (handle_empty_input(input, trimmed, ctx));
 	free(trimmed);
+	if (has_unclosed_quotes(input))
+		return (handle_quote_error(input, ctx));
 	input = handle_line_continuation(input, ctx);
 	if (!input)
 		return (NULL);
