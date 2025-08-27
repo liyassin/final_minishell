@@ -1,50 +1,36 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   command_exec_utils.c                               :+:      :+:    :+:   */
+/*   command_exec_process_utils.c                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/01/15 15:30:00 by anassih           #+#    #+#             */
+/*   Created: 2025/08/27 07:39:44 by anassih           #+#    #+#             */
 /*   Updated: 2025/08/27 07:42:13 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
-void	setup_child_signals(void)
+void	handle_fork_error(t_context *ctx)
 {
-	signal(SIGINT, SIG_DFL);
-	signal(SIGQUIT, SIG_DFL);
+	ctx->exit_status = 1;
+	perror("minishell: fork");
 }
 
-void	handle_exec_failure(char *command, char *full_path, t_context *ctx)
+void	execute_fork_process(t_ast *ast, t_context *ctx)
 {
-	if (full_path)
+	pid_t	pid;
+
+	pid = fork();
+	if (pid == 0)
 	{
-		free(full_path);
-		perror(command);
-		ctx->exit_status = 126;
+		reset_default_signals();
+		child_exec(ast, ctx);
+		exit(ctx->exit_status);
 	}
+	else if (pid > 0)
+		handle_parent_process(pid, ctx);
 	else
-		handle_command_not_found(command);
-}
-
-int	should_search_path(char *command)
-{
-	return (!ft_strchr(command, '/'));
-}
-
-int	has_heredoc_redir(t_ast *ast)
-{
-	t_redir	*redir;
-
-	redir = ast->redirs;
-	while (redir)
-	{
-		if (redir->type == REDIR_HEREDOC)
-			return (1);
-		redir = redir->next;
-	}
-	return (0);
+		handle_fork_error(ctx);
 }

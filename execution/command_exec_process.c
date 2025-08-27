@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/27 05:30:00 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/27 06:54:03 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/27 07:42:13 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ static void	handle_child_builtin(t_ast *ast, t_context *ctx)
 	}
 }
 
-static void	child_exec(t_ast *ast, t_context *ctx)
+void	child_exec(t_ast *ast, t_context *ctx)
 {
 	char	*path;
 
@@ -91,27 +91,4 @@ void	handle_parent_process(pid_t pid, t_context *ctx)
 		ctx->exit_status = 128 + WTERMSIG(status);
 		write(STDOUT_FILENO, "\n", 1);
 	}
-}
-
-void	handle_fork_error(t_context *ctx)
-{
-	ctx->exit_status = 1;
-	perror("minishell: fork");
-}
-
-void	execute_fork_process(t_ast *ast, t_context *ctx)
-{
-	pid_t	pid;
-
-	pid = fork();
-	if (pid == 0)
-	{
-		reset_default_signals();
-		child_exec(ast, ctx);
-		exit(ctx->exit_status);
-	}
-	else if (pid > 0)
-		handle_parent_process(pid, ctx);
-	else
-		handle_fork_error(ctx);
 }

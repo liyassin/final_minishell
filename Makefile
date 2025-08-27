@@ -42,7 +42,9 @@ EXEC_SRCS := \
 	execution/builtin_dispatch.c \
 	execution/command_exec.c \
 	execution/command_exec_utils.c \
+	execution/command_exec_utils2.c \
 	execution/command_exec_process.c \
+	execution/command_exec_process_utils.c \
 	execution/command_errors.c \
 	execution/executor.c \
 	execution/executor_utils.c \
@@ -67,7 +69,8 @@ ENV_SRCS := \
 	env_utils/env_array.c \
 	env_utils/env_expand_build.c \
 	env_utils/env_expand_len.c \
-	env_utils/env_utils.c
+	env_utils/env_utils.c \
+	env_utils/env_expand_utils.c
 
 ROOT_SRCS := \
 	signals.c \

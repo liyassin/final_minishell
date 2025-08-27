@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 21:35:01 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/27 07:17:33 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/27 07:42:13 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,9 +35,10 @@
 # include "signals.h"
 # include "tokenization.h"
 
-typedef struct s_ast		t_ast;
-typedef struct s_redir		t_redir;
-typedef struct s_context	t_context;
+typedef struct s_ast			t_ast;
+typedef struct s_redir			t_redir;
+typedef struct s_context		t_context;
+extern volatile sig_atomic_t	g_signal;
 
 typedef enum e_builtin
 {
@@ -45,8 +46,6 @@ typedef enum e_builtin
 	PARENT_BUILTIN,
 	CHILD_BUILTIN
 }	t_builtin;
-
-extern volatile sig_atomic_t	g_signal;
 
 typedef struct s_context
 {
@@ -116,6 +115,7 @@ int			is_arg_empty_str(char **args);
 int			is_numeric_arg(char *arg);
 
 // command_exec_process.c
+void		child_exec(t_ast *ast, t_context *ctx);
 void		handle_parent_process(pid_t pid, t_context *ctx);
 void		handle_fork_error(t_context *ctx);
 void		execute_fork_process(t_ast *ast, t_context *ctx);

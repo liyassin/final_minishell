@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 18:19:33 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/27 06:54:03 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/27 07:42:13 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,36 +16,10 @@
 size_t	copy_dollar_seq(const char *in, t_expand_ctx *ctx, char *out,
 	size_t *skip)
 {
-	size_t	vlen;
-	char	name[128];
-	char	*value;
-	char	*s;
-	size_t	written;
-
 	if (in[1] == '?')
-	{
-		s = ft_itoa(ctx->exit_status);
-		if (!s)
-			return (0);
-		written = ft_strlen(s);
-		ft_strlcpy(out, s, written + 1);
-		free(s);
-		*skip = 2;
-		return (written);
-	}
+		return (handle_exit_status(ctx, out, skip));
 	if (ft_isalpha(in[1]) || in[1] == '_')
-	{
-		vlen = extract_var_name(in + 1, name, sizeof(name));
-		value = get_env_value(name, ctx->envp);
-		*skip = 1 + vlen;
-		if (value)
-		{
-			written = ft_strlen(value);
-			ft_strlcpy(out, value, written + 1);
-			return (written);
-		}
-		return (0);
-	}
+		return (handle_var_expansion(in, ctx, out, skip));
 	out[0] = '$';
 	*skip = 1;
 	return (1);

@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 21:35:01 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/27 00:37:48 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/27 07:42:13 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,9 @@ typedef struct s_expand_ctx
 
 size_t	copy_dollar_seq(const char *in, t_expand_ctx *ctx, char *out,
 			size_t *skip);
+size_t	handle_exit_status(t_expand_ctx *ctx, char *out, size_t *skip);
+size_t	handle_var_expansion(const char *in, t_expand_ctx *ctx,
+			char *out, size_t *skip);
 void	build_str(const char *in, char **envp, int exit_status, char *out);
 
 #endif
