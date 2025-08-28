@@ -218,7 +218,7 @@ The parsing system is the brain of our shell, transforming raw user input into a
 
 ```mermaid
 graph TD
-    A[Raw Input: 'ls -la | grep .c > output.txt'] --> B[Line Reader]
+    A["Raw Input: 'ls -la &#124; grep .c > output.txt'"] --> B[Line Reader]
     B --> C[Syntax Validation]
     C --> D[Smart Tokenization]
     D --> E[Quote Processing]
@@ -235,9 +235,9 @@ graph TD
     
     subgraph "AST Structure"
         M[Pipeline Node]
-        N[Command Node 1: ls -la]
-        O[Command Node 2: grep .c]
-        P[Redirection Node: > output.txt]
+        N["Command Node 1: ls -la"]
+        O["Command Node 2: grep .c"]
+        P["Redirection Node: > output.txt"]
     end
     
     D --> I
@@ -274,7 +274,7 @@ if (has_unmatched_quotes(line))
 #### Phase 2: **Smart Tokenization** - The Request Analyzer
 ```mermaid
 graph LR
-    A["ls -la | grep .c > output.txt"] --> B[Smart Split]
+    A["ls -la &#124; grep .c > output.txt"] --> B[Smart Split]
     B --> C["['ls', '-la']"]
     B --> D["['grep', '.c']"]  
     B --> E["['>', 'output.txt']"]
@@ -317,14 +317,14 @@ t_token *smart_tokenize(char *input)
 #### Phase 3: **AST Construction** - The Master Organizer
 ```mermaid
 graph TD
-    A[Input: ls -la | grep .c > output.txt] --> B[Parse Pipeline]
+    A["Input: ls -la &#124; grep .c > output.txt"] --> B[Parse Pipeline]
     
     B --> C[Pipeline Root]
-    C --> D[Left Command: ls -la]
-    C --> E[Right Side: grep .c > output.txt]
+    C --> D["Left Command: ls -la"]
+    C --> E["Right Side: grep .c > output.txt"]
     
-    E --> F[Command: grep .c]
-    E --> G[Redirection: > output.txt]
+    E --> F["Command: grep .c"]
+    E --> G["Redirection: > output.txt"]
     
     D --> H[Program: ls]
     D --> I[Args: -la]
@@ -355,6 +355,7 @@ typedef struct s_ast_node
     t_redirection   *redirections;  // List of redirections
 }   t_ast_node;
 
+```c
 // Example AST for: echo "hello" | grep hello > output.txt
 //
 //           PIPELINE
@@ -384,9 +385,9 @@ char *input = "echo 'He said \"Hello $USER\"' > 'my file.txt'";
 #### Variable Expansion Engine
 ```mermaid
 graph TD
-    A["echo $USER-$PWD"] --> B[Identify Variables]
-    B --> C[Lookup $USER → 'anassih']
-    B --> D[Lookup $PWD → '/home/anassih']
+    A["echo &#36;USER-&#36;PWD"] --> B[Identify Variables]
+    B --> C["Lookup &#36;USER → 'anassih'"]
+    B --> D["Lookup &#36;PWD → '/home/anassih'"]
     C --> E[Build Result]
     D --> E
     E --> F["echo anassih-/home/anassih"]
@@ -496,7 +497,7 @@ int execute_ast(t_ast_node *node, t_shell *shell)
 #### Movement 2: **Simple Command Execution** - Solo Performance
 ```mermaid
 graph TD
-    A[Command: 'ls -la /home'] --> B[Path Resolution]
+    A["Command: 'ls -la /home'"] --> B[Path Resolution]
     B --> C{Is it built-in?}
     C -->|Yes| D[Execute Built-in]
     C -->|No| E[Find in PATH]
@@ -505,7 +506,7 @@ graph TD
     F --> G[Fork Process]
     G --> H[Setup Environment]
     H --> I[Handle Redirections]
-    I --> J[execve('/bin/ls', args, env)]
+    I --> J["execve('/bin/ls', args, env)"]
     
     J --> K[Parent Waits]
     K --> L[Collect Exit Status]
@@ -551,21 +552,21 @@ int execute_simple_command(t_ast_node *node, t_shell *shell)
 #### Movement 3: **Pipeline Execution** - Orchestra Ensemble
 ```mermaid
 graph TD
-    A["Pipeline: ls -la | grep .c | wc -l"] --> B[Parse Pipeline Components]
+    A["Pipeline: ls -la &#124; grep .c &#124; wc -l"] --> B[Parse Pipeline Components]
     
-    B --> C[Command 1: ls -la]
-    B --> D[Command 2: grep .c]  
-    B --> E[Command 3: wc -l]
+    B --> C["Command 1: ls -la"]
+    B --> D["Command 2: grep .c"]  
+    B --> E["Command 3: wc -l"]
     
-    F[Create Pipes] --> G[pipe1: ls → grep]
-    F --> H[pipe2: grep → wc]
+    F[Create Pipes] --> G["pipe1: ls → grep"]
+    F --> H["pipe2: grep → wc"]
     
     I[Process Creation] --> J[Fork Process 1]
     I --> K[Fork Process 2]
     I --> L[Fork Process 3]
     
     M[File Descriptor Setup] --> N[Connect stdout to pipe1]
-    M --> O[Connect stdin from pipe1, stdout to pipe2]
+    M --> O["Connect stdin from pipe1, stdout to pipe2"]
     M --> P[Connect stdin from pipe2]
     
     Q[Synchronization] --> R[Wait for all processes]
@@ -634,15 +635,15 @@ int execute_builtin(t_ast_node *node, t_shell *shell)
 #### Redirection Mastery
 ```mermaid
 graph TD
-    A[Input: 'cat < input.txt > output.txt 2> error.log'] --> B[Parse Redirections]
+    A["Input: 'cat < input.txt > output.txt 2> error.log'"] --> B[Parse Redirections]
     
-    B --> C[stdin < input.txt]
-    B --> D[stdout > output.txt]
-    B --> E[stderr 2> error.log]
+    B --> C["stdin < input.txt"]
+    B --> D["stdout > output.txt"]
+    B --> E["stderr 2> error.log"]
     
-    F[File Descriptor Setup] --> G[fd[0] → input.txt]
-    F --> H[fd[1] → output.txt]  
-    F --> I[fd[2] → error.log]
+    F[File Descriptor Setup] --> G["fd[0] → input.txt"]
+    F --> H["fd[1] → output.txt"]  
+    F --> I["fd[2] → error.log"]
     
     J[Execute Command] --> K[Command reads from input.txt]
     K --> L[Command writes to output.txt]
