@@ -937,6 +937,6 @@ This project is part of the 42 School curriculum. Please respect the academic in
 
 ---
 
-**Made with ❤️ by [anassih](https://github.com/liyassin) at 42 School**
+**Made with ❤️ by [anassih](https://github.com/0x4ymn) & [liyassin](https://github.com/liyassin) at 1337 Coding School (42 School) - University of Mohammed VI Polytechnic**
 
 *Ready for evaluation! 🚀*
