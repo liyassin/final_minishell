@@ -6,12 +6,13 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 18:15:30 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/28 00:18:27 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/28 02:05:14 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 #include "../includes/signals.h"
+#include "../includes/cleanup.h"
 #include <signal.h>
 
 // Execute one AST node in child: redirs, builtins, or external.

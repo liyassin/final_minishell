@@ -6,12 +6,13 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/27 05:30:00 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/28 00:18:27 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/28 02:05:14 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 #include "../includes/signals.h"
+#include "../includes/cleanup.h"
 
 static void	handle_child_exit(char **args, t_context *ctx)
 {

@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/28 17:27:55 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/26 21:26:43 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/28 02:05:14 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,3 +52,11 @@ void	free_split(char **str)
 
 // Declaration only, implementation is in ast_utils.c
 void	free_ast(t_ast *ast);
+
+// Cleanup function for child processes before execve
+void	cleanup_child_before_exec(t_context *ctx)
+{
+	if (ctx->ast_head)
+		free_ast(ctx->ast_head);
+	ctx->ast_head = NULL;
+}
