@@ -6,11 +6,12 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 18:16:18 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/27 09:07:13 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/28 02:35:52 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
+#include "../includes/signals.h"
 
 static void	handle_signal_status(t_context *ctx)
 {
@@ -80,6 +81,7 @@ int	main(int argc, char **argv, char **envp)
 	(void)argc;
 	(void)argv;
 	init_context(&ctx, envp);
+	set_signal_context(&ctx);
 	should_exit = 0;
 	skip_prompt = 0;
 	while (!should_exit)

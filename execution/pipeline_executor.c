@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 18:15:30 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/28 02:05:14 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/28 02:42:37 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,35 +14,6 @@
 #include "../includes/signals.h"
 #include "../includes/cleanup.h"
 #include <signal.h>
-
-// Execute one AST node in child: redirs, builtins, or external.
-static void	exec_node(t_ast *node, t_context *ctx)
-{
-	t_builtin	type;
-	char		*path;
-
-	if (handle_redirection(node) < 0)
-		exit(1);
-	if (!node->command || !*node->command)
-		exit(0);
-	type = get_builtin_type(node->args[0]);
-	if (type != NOT_BUILTIN)
-		exit(handle_builtin(node->args, ctx));
-	path = find_command_path(node->command, ctx);
-	if (!path)
-		handle_command_not_found(node->command);
-	if (path == (char *)-1)
-	{
-		ft_putstr_fd("minishell: ", STDERR_FILENO);
-		ft_putstr_fd(node->command, STDERR_FILENO);
-		ft_putstr_fd(": Permission denied\n", STDERR_FILENO);
-		exit(126);
-	}
-	execve(path, node->args, ctx->env);
-	perror("minishell");
-	free(path);
-	exit(126);
-}
 
 // Get the nth node from the AST linked list
 static t_ast	*get_nth_node(t_ast *ast, int n)
@@ -85,7 +56,7 @@ static int	fork_single_child(t_ast *ast, t_context *ctx,
 	return (0);
 }
 
-static int	fork_children(t_ast *ast, t_context *ctx, t_pipeline_data *data)
+int	fork_children(t_ast *ast, t_context *ctx, t_pipeline_data *data)
 {
 	int	i;
 
@@ -109,22 +80,18 @@ void	execute_pipeline(t_ast *ast, t_context *ctx)
 
 	if (!ast || !ctx)
 		return ;
+	ctx->in_pipeline = 1;
 	n = count_pipeline(ast);
 	if (n <= 0)
+	{
+		ctx->in_pipeline = 0;
 		return ;
+	}
 	if (setup_pipeline_resources(n, &pipes, &pids) < 0)
 		return ;
 	data.n = n;
 	data.pipes = pipes;
 	data.pids = pids;
-	if (fork_children(ast, ctx, &data) < 0)
-	{
-		free(pipes);
-		free(pids);
-		return ;
-	}
-	close_pipes(n, pipes);
-	free(pipes);
-	wait_pipeline(n, pids, ctx);
-	free(pids);
+	execute_pipeline_main(ast, ctx, &data);
+	ctx->in_pipeline = 0;
 }

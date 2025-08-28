@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 21:35:01 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/28 00:22:49 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/28 02:42:37 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 # include <fcntl.h>
 # include <libft.h>
 # include <limits.h>
+# include <stdio.h>
 # include <readline/history.h>
 # include <readline/readline.h>
 # include <signal.h>
@@ -54,6 +55,8 @@ typedef struct s_context
 	int		exit_status;
 	pid_t	main_process_pid;
 	int		heredoc_interrupted;
+	int		in_child_process;
+	int		in_pipeline;
 	t_ast	*ast_head;
 }	t_context;
 
@@ -86,8 +89,20 @@ void		close_remaining_heredocs(t_ast *head);
 void		handle_interrupted_heredoc(t_redir *r, t_context *ctx);
 void		handle_successful_heredoc(t_redir *r);
 
+typedef struct s_pipeline_data
+{
+	int		n;
+	int		(*pipes)[2];
+	pid_t	*pids;
+}	t_pipeline_data;
+
 // pipeline executor utils
+void		exec_node(t_ast *node, t_context *ctx);
 void		wait_pipeline(int n, pid_t *pids, t_context *ctx);
+void		cleanup_pipeline_fail(int (*pipes)[2], pid_t *pids);
+void		execute_pipeline_main(t_ast *ast, t_context *ctx,
+				t_pipeline_data *data);
+int			fork_children(t_ast *ast, t_context *ctx, t_pipeline_data *data);
 
 // substitution utility functions
 int			setup_substitution_pipe(int pipefd[2]);
@@ -129,12 +144,5 @@ void		init_context(t_context *ctx, char **envp);
 // heredoc_utils.c
 void		write_heredoc_line(t_redir *r, char *line, t_context *ctx);
 void		close_remaining_heredocs(t_ast *head);
-
-typedef struct s_pipeline_data
-{
-	int		n;
-	int		(*pipes)[2];
-	pid_t	*pids;
-}	t_pipeline_data;
 
 #endif

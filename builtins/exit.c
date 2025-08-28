@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 16:37:57 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/27 05:38:25 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/28 02:35:52 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,8 @@ int	builtin_exit(char **args, t_context *ctx)
 	if (!ctx)
 		return (1);
 	code = (long)ctx->exit_status;
-	ft_putendl_fd("exit", STDOUT_FILENO);
+	if (!ctx->in_child_process)
+		ft_putendl_fd("exit", STDOUT_FILENO);
 	if (args[1])
 	{
 		if (args[2])

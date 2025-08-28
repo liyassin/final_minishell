@@ -6,7 +6,7 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 16:41:57 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/26 23:27:24 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/28 02:35:52 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,15 +14,19 @@
 #include "../includes/signals.h"
 
 volatile sig_atomic_t	g_signal = 0;
+static t_context		*g_ctx = NULL;
 
 void	handle_sigint(int sig)
 {
 	g_signal = SIGINT;
 	(void)sig;
 	write(STDOUT_FILENO, "\n", 1);
-	rl_on_new_line();
-	rl_replace_line("", 0);
-	rl_redisplay();
+	if (!g_ctx || !g_ctx->in_pipeline)
+	{
+		rl_on_new_line();
+		rl_replace_line("", 0);
+		rl_redisplay();
+	}
 }
 
 void	setup_shell_signals(void)
@@ -51,4 +55,9 @@ void	reset_default_signals(void)
 {
 	signal(SIGINT, SIG_DFL);
 	signal(SIGQUIT, SIG_DFL);
+}
+
+void	set_signal_context(t_context *ctx)
+{
+	g_ctx = ctx;
 }

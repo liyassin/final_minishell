@@ -6,10 +6,11 @@
 /*   By: anassih <anassih@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/27 05:30:00 by anassih           #+#    #+#             */
-/*   Updated: 2025/08/28 02:05:14 by anassih          ###   ########.fr       */
+/*   Updated: 2025/08/28 02:35:52 by anassih          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <stdio.h>
 #include "../includes/minishell.h"
 #include "../includes/signals.h"
 #include "../includes/cleanup.h"
@@ -19,7 +20,6 @@ static void	handle_child_exit(char **args, t_context *ctx)
 	long	code;
 
 	code = (long)ctx->exit_status;
-	ft_putendl_fd("exit", STDOUT_FILENO);
 	if (args[1])
 	{
 		if (args[2])
@@ -62,6 +62,7 @@ void	child_exec(t_ast *ast, t_context *ctx)
 {
 	char	*path;
 
+	ctx->in_child_process = 1;
 	reset_default_signals();
 	if (handle_redirection(ast) < 0)
 	{
