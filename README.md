@@ -507,7 +507,7 @@ graph TD
     C -->|Yes| D[Execute Built-in]
     C -->|No| E[Find in PATH]
     
-    E --> F[/bin/ls found]
+    E --> F["/bin/ls found"]
     F --> G[Fork Process]
     G --> H[Setup Environment]
     H --> I[Handle Redirections]
